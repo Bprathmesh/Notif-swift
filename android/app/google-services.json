@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "292196485875",
+    "project_id": "pbrathmesh",
+    "storage_bucket": "pbrathmesh.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:292196485875:android:c48287349020929dd68586",
+        "android_client_info": {
+          "package_name": "com.pb.notif"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmN3pVcX3rSnMH1I4lVtxZxriY7V9YgHs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

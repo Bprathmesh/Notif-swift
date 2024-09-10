@@ -1,0 +1,11 @@
+{
+    "aps": {
+      "alert": {
+        "title": "",
+        "subtitle": "shiv",
+        "body": "ganesha sambsadashiv"
+      }
+    },
+    "Simulator Target Bundle": "com.example.mypushnotifications"
+  }
+  
