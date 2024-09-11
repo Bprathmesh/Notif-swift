@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -10,50 +12,10 @@ class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  final _auth = FirebaseAuth.instance;
+  final _nameController = TextEditingController();
   bool _isLoading = false;
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter an email';
-    }
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return 'Please enter a valid email';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a password';
-    }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters long';
-    }
-    return null;
-  }
-
-  String? _validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please confirm your password';
-    }
-    if (value != _passwordController.text) {
-      return 'Passwords do not match';
-    }
-    return null;
-  }
-
-  Future<void> _testAnonymousSignIn() async {
-    try {
-      print('Attempting anonymous sign-in');
-      final userCredential = await FirebaseAuth.instance.signInAnonymously();
-      print('Anonymous sign-in successful');
-      print('User UID: ${userCredential.user?.uid}');
-    } catch (e) {
-      print('Anonymous sign-in failed: $e');
-    }
-  }
+  bool _receivePromotions = false;
+  bool _receiveUpdates = false;
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
@@ -61,45 +23,27 @@ class _RegisterPageState extends State<RegisterPage> {
         _isLoading = true;
       });
 
-      // Call the test anonymous sign-in function
-      await _testAnonymousSignIn();
-      
       try {
-        print('Starting registration process');
-        print('Email: ${_emailController.text.trim()}');
-        print('Password length: ${_passwordController.text.length}');
-        
-        print('Attempting to create user');
-        final userCredential = await _auth.createUserWithEmailAndPassword(
+        final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
-        
-        print('User registered successfully');
-        print('User UID: ${userCredential.user?.uid}');
-        
-        // Navigate to the preferences page
-        Navigator.pushReplacementNamed(context, '/preferences');
-      } on FirebaseAuthException catch (e) {
-        print('FirebaseAuthException caught:');
-        print('  Error code: ${e.code}');
-        print('  Error message: ${e.message}');
-        print('  Stack trace:');
-        print(e.stackTrace);
-        
-        String errorMessage = 'Registration failed: ${e.message}';
+
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+
+        await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+          'email': userCredential.user!.email,
+          'name': _nameController.text,
+          'fcmToken': fcmToken,
+          'receivePromotions': _receivePromotions,
+          'receiveUpdates': _receiveUpdates,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        Navigator.pushReplacementNamed(context, '/home');
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
-      } catch (e, stackTrace) {
-        print('Unexpected error during registration:');
-        print('  Error type: ${e.runtimeType}');
-        print('  Error details: $e');
-        print('  Stack trace:');
-        print(stackTrace);
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An unexpected error occurred. Please try again.')),
+          SnackBar(content: Text('Registration failed: $e')),
         );
       } finally {
         setState(() {
@@ -112,62 +56,59 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Register')),
+      appBar: AppBar(title: const Text('Register')),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email),
-                ),
-                keyboardType: TextInputType.emailAddress,
-                validator: _validateEmail,
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+                validator: (value) => value!.isEmpty ? 'Please enter your name' : null,
               ),
-              SizedBox(height: 16),
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                validator: (value) => value!.isEmpty ? 'Please enter an email' : null,
+              ),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  prefixIcon: Icon(Icons.lock),
-                ),
+                decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
-                validator: _validatePassword,
+                validator: (value) => value!.length < 6 ? 'Password must be at least 6 characters' : null,
               ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _confirmPasswordController,
-                decoration: InputDecoration(
-                  labelText: 'Confirm Password',
-                  prefixIcon: Icon(Icons.lock_outline),
-                ),
-                obscureText: true,
-                validator: _validateConfirmPassword,
+              SwitchListTile(
+                title: const Text('Receive Promotions'),
+                value: _receivePromotions,
+                onChanged: (bool value) {
+                  setState(() {
+                    _receivePromotions = value;
+                  });
+                },
               ),
-              SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _isLoading ? null : _register,
-                child: _isLoading
-                    ? CircularProgressIndicator()
-                    : Text('Register'),
+              SwitchListTile(
+                title: const Text('Receive Updates'),
+                value: _receiveUpdates,
+                onChanged: (bool value) {
+                  setState(() {
+                    _receiveUpdates = value;
+                  });
+                },
               ),
+              const SizedBox(height: 20),
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: _register,
+                      child: const Text('Register'),
+                    ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
   }
 }

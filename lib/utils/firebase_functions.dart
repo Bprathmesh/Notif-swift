@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:cloud_functions/cloud_functions.dart';
 
 Future<bool> sendPersonalizedNotification(String userId) async {

@@ -1,33 +1,52 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:mypushnotifications/models/notification.dart' as MyNotification;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class NotificationHistoryPage extends StatelessWidget {
+class NotificationHistoryPage extends StatefulWidget {
+  @override
+  _NotificationHistoryPageState createState() => _NotificationHistoryPageState();
+}
+
+class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
+    final userId = _auth.currentUser!.uid;
+
     return Scaffold(
-      appBar: AppBar(title: Text('Notification History')),
+      appBar: AppBar(
+        title: const Text('Notification History'),
+      ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore.collection('notifications').snapshots(),
+        stream: _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('notifications')
+            .orderBy('timestamp', descending: true)
+            .snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
           }
-          if (!snapshot.hasData) {
-            return Center(child: CircularProgressIndicator());
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No notifications available'));
           }
+
           final notifications = snapshot.data!.docs;
+
           return ListView.builder(
             itemCount: notifications.length,
             itemBuilder: (context, index) {
-              final notification = MyNotification.Notification.fromMap(
-                notifications[index].data() as Map<String, dynamic>
-              );
+              final notification = notifications[index].data() as Map<String, dynamic>;
               return ListTile(
-                title: Text(notification.title),
-                subtitle: Text(notification.body),
+                title: Text(notification['title'] ?? 'No Title'),
+                subtitle: Text(notification['body'] ?? 'No Body'),
+                trailing: Text(
+                  (notification['timestamp'] as Timestamp).toDate().toString(),
+                  style: const TextStyle(fontSize: 12),
+                ),
               );
             },
           );
