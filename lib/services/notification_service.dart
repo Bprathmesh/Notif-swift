@@ -10,20 +10,38 @@ class NotificationService {
 
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  static const String _channelId = 'default_channel_id';
+  static const String _channelName = 'Default Notifications';
 
   Future<void> init() async {
-    await _fcm.requestPermission();
-    
-    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-    final InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    try {
+      await _fcm.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
 
-    FirebaseMessaging.onMessage.listen(_handleMessage);
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+      final InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+      await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+      FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+      FirebaseMessaging.onMessageOpenedApp.listen(_handleBackgroundMessage);
+      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+      String? token = await _fcm.getToken();
+      await _saveTokenToFirestore(token);
+
+      _fcm.onTokenRefresh.listen(_saveTokenToFirestore);
+    } catch (e) {
+      print('Error initializing NotificationService: $e');
+    }
   }
 
-  void _handleMessage(RemoteMessage message) {
+  void _handleForegroundMessage(RemoteMessage message) {
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification?.android;
 
@@ -32,61 +50,162 @@ class NotificationService {
     }
   }
 
+  void _handleBackgroundMessage(RemoteMessage message) {
+    print("Handling a background message: ${message.messageId}");
+  }
+
   static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     print("Handling a background message: ${message.messageId}");
-    // You might want to show a notification here as well
   }
 
   Future<void> _showNotification(String title, String body) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-    AndroidNotificationDetails(
-      'your_channel_id',
-      'your_channel_name',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-    const NotificationDetails platformChannelSpecifics =
-    NotificationDetails(android: androidPlatformChannelSpecifics);
-    await _flutterLocalNotificationsPlugin.show(
-      0, // Notification ID
-      title,
-      body,
-      platformChannelSpecifics,
-    );
+    try {
+      const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        _channelId,
+        _channelName,
+        importance: Importance.max,
+        priority: Priority.high,
+      );
+      const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
 
-    // Save notification to Firestore
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('notifications')
-          .add({
-        'title': title,
-        'body': body,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
+      await _flutterLocalNotificationsPlugin.show(
+        0, // Notification ID
+        title,
+        body,
+        platformChannelSpecifics,
+      );
+
+      await _saveNotificationToFirestore(title, body);
+    } catch (e) {
+      print('Error showing notification: $e');
     }
   }
 
-  Future<void> sendPersonalizedNotification() async {
-    final user = FirebaseAuth.instance.currentUser;
+  Future<void> _saveTokenToFirestore(String? token) async {
+    if (token != null) {
+      final user = _auth.currentUser;
+      if (user != null) {
+        try {
+          await _firestore
+              .collection('users')
+              .doc(user.uid)
+              .update({'fcmToken': token});
+        } catch (e) {
+          print('Error saving FCM token to Firestore: $e');
+        }
+      }
+    }
+  }
+
+  Future<void> _saveNotificationToFirestore(String title, String body) async {
+    final user = _auth.currentUser;
     if (user != null) {
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      final userData = userDoc.data() as Map<String, dynamic>;
-
-      String title = 'Hello ${userData['name']}!';
-      String body = 'This is a personalized notification.';
-
-      if (userData['receivePromotions'] == true) {
-        body += ' Check out our latest promotions!';
+      try {
+        await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('notifications')
+            .add({
+          'title': title,
+          'body': body,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+      } catch (e) {
+        print('Error saving notification to Firestore: $e');
       }
+    }
+  }
 
-      if (userData['receiveUpdates'] == true) {
-        body += ' We have some updates for you.';
+  Future<void> sendPersonalizedNotification({String title = '', String body = ''}) async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+        
+        if (userDoc.exists) {
+          Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+
+          if (userData['receiveNotifications'] == true) {
+            title = title.isEmpty ? 'Hello ${userData['name'] ?? 'User'}!' : title;
+            body = body.isEmpty ? 'This is a personalized notification just for you.' : body;
+
+            await _showNotification(title, body);
+          } else {
+            print('User has not opted in for notifications');
+          }
+        } else {
+          print('User document does not exist');
+        }
       }
+    } catch (e) {
+      print('Error sending personalized notification: $e');
+    }
+  }
 
-      await _showNotification(title, body);
+  Future<void> sendPromotionalNotification() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+        
+        if (userDoc.exists) {
+          Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+
+          if (userData['receivePromotions'] == true && userData['receiveNotifications'] == true) {
+            String title = 'Special Offer!';
+            String body = '${userData['name'] ?? 'User'}, check out our latest promotion!';
+
+            await _showNotification(title, body);
+          } else {
+            print('User has not opted in for promotional notifications');
+          }
+        } else {
+          print('User document does not exist');
+        }
+      }
+    } catch (e) {
+      print('Error sending promotional notification: $e');
+    }
+  }
+
+  Future<void> sendUpdateNotification() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+        
+        if (userDoc.exists) {
+          Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+
+          if (userData['receiveUpdates'] == true && userData['receiveNotifications'] == true) {
+            String title = 'New Update Available';
+            String body = '${userData['name'] ?? 'User'}, we have some exciting updates for you!';
+
+            await _showNotification(title, body);
+          } else {
+            print('User has not opted in for update notifications');
+          }
+        } else {
+          print('User document does not exist');
+        }
+      }
+    } catch (e) {
+      print('Error sending update notification: $e');
+    }
+  }
+  Future<void> deleteNotification(String notificationId) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      try {
+        await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('notifications')
+            .doc(notificationId)
+            .delete();
+      } catch (e) {
+        print('Error deleting notification: $e');
+      }
     }
   }
 }

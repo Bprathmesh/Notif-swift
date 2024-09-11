@@ -8,69 +8,66 @@ class PreferencesPage extends StatefulWidget {
 }
 
 class _PreferencesPageState extends State<PreferencesPage> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool _receivePromotions = false;
   bool _receiveUpdates = false;
 
   @override
   void initState() {
     super.initState();
-    _loadUserPreferences();
+    _loadPreferences();
   }
 
-  Future<void> _loadUserPreferences() async {
+  Future<void> _loadPreferences() async {
     final userId = _auth.currentUser!.uid;
     final userDoc = await _firestore.collection('users').doc(userId).get();
+    final data = userDoc.data();
 
     setState(() {
-      _receivePromotions = userDoc['receivePromotions'] ?? false;
-      _receiveUpdates = userDoc['receiveUpdates'] ?? false;
+      _receivePromotions = data?['receivePromotions'] ?? false;
+      _receiveUpdates = data?['receiveUpdates'] ?? false;
     });
   }
 
-  Future<void> _saveUserPreferences() async {
+  Future<void> _savePreferences() async {
     final userId = _auth.currentUser!.uid;
+
     await _firestore.collection('users').doc(userId).update({
       'receivePromotions': _receivePromotions,
       'receiveUpdates': _receiveUpdates,
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Preferences updated successfully')),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Preferences')),
+      appBar: AppBar(
+        title: const Text('Preferences'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          children: [
+          children: <Widget>[
             SwitchListTile(
               title: const Text('Receive Promotions'),
               value: _receivePromotions,
-              onChanged: (value) {
+              onChanged: (bool value) {
                 setState(() {
                   _receivePromotions = value;
                 });
+                _savePreferences();
               },
             ),
             SwitchListTile(
               title: const Text('Receive Updates'),
               value: _receiveUpdates,
-              onChanged: (value) {
+              onChanged: (bool value) {
                 setState(() {
                   _receiveUpdates = value;
                 });
+                _savePreferences();
               },
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _saveUserPreferences,
-              child: const Text('Save Preferences'),
             ),
           ],
         ),

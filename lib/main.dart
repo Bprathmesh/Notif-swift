@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-// Update the import paths according to your project structure
 import 'pages/home_page.dart';
-import 'pages/login_page.dart';
+import 'pages/sign_in_page.dart';
 import 'pages/register_page.dart';
 import 'pages/notification_history_page.dart';
 import 'pages/preferences_page.dart';
-import 'pages/wrapper.dart'; // Import Wrapper class
+import 'pages/wrapper.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'services/notification_service.dart'; // Ensure you import the NotificationService
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await NotificationService().init();
   runApp(MyApp());
 }
 
@@ -20,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Firebase Auth Demo',
+      title: 'Notification App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -28,7 +27,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => Wrapper(),
         '/home': (context) => HomePage(),
-        '/login': (context) => LoginPage(),
+        '/sign_in': (context) => SignInPage(),
         '/register': (context) => RegisterPage(),
         '/notification_history': (context) => NotificationHistoryPage(),
         '/preferences': (context) => PreferencesPage(),
