@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mypushnotifications/models/user.dart' as AppUser;
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -13,8 +14,10 @@ class NotificationService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  static const String _channelId = 'default_channel_id';
-  static const String _channelName = 'Default Notifications';
+  static const String _defaultChannelId = 'default_channel_id';
+  static const String _defaultChannelName = 'Default Notifications';
+  static const String _personalizedChannelId = 'personalized_channel_id';
+  static const String _personalizedChannelName = 'Personalized Notifications';
 
   Future<void> init() async {
     try {
@@ -36,6 +39,16 @@ class NotificationService {
       await _saveTokenToFirestore(token);
 
       _fcm.onTokenRefresh.listen(_saveTokenToFirestore);
+
+      // Create a notification channel for personalized notifications
+      const AndroidNotificationChannel personalizedChannel = AndroidNotificationChannel(
+        _personalizedChannelId,
+        _personalizedChannelName,
+        importance: Importance.high,
+      );
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(personalizedChannel);
     } catch (e) {
       print('Error initializing NotificationService: $e');
     }
@@ -61,8 +74,8 @@ class NotificationService {
   Future<void> _showNotification(String title, String body) async {
     try {
       const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        _channelId,
-        _channelName,
+        _defaultChannelId,
+        _defaultChannelName,
         importance: Importance.max,
         priority: Priority.high,
       );
@@ -116,20 +129,20 @@ class NotificationService {
     }
   }
 
-  Future<void> sendPersonalizedNotification({String title = '', String body = ''}) async {
+  Future<void> sendPersonalizedNotification({required String title, required String body, required String userId}) async {
     try {
       final user = _auth.currentUser;
       if (user != null) {
         DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
         
         if (userDoc.exists) {
-          Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+          AppUser.User appUser = AppUser.User.fromMap(userDoc.data() as Map<String, dynamic>);
 
-          if (userData['receiveNotifications'] == true) {
-            title = title.isEmpty ? 'Hello ${userData['name'] ?? 'User'}!' : title;
-            body = body.isEmpty ? 'This is a personalized notification just for you.' : body;
+          if (appUser.receiveNotifications) {
+            String title = 'Hello ${appUser.name}!';
+            String body = _getPersonalizedBody(appUser);
 
-            await _showNotification(title, body);
+            await _showPersonalizedNotification(title, body);
           } else {
             print('User has not opted in for notifications');
           }
@@ -140,6 +153,65 @@ class NotificationService {
     } catch (e) {
       print('Error sending personalized notification: $e');
     }
+  }
+
+  String _getPersonalizedBody(AppUser.User user) {
+    if (user.interests.isEmpty) {
+      return "Check out our latest updates!";
+    }
+
+    String interest = user.interests[DateTime.now().microsecond % user.interests.length];
+    
+    Map<String, List<String>> interestMessages = {
+      'Technology': [
+        "New tech gadget just launched!",
+        "Breaking news in AI development!",
+        "Discover the latest in smart home technology.",
+      ],
+      'Sports': [
+        "Big game alert! Don't miss the action.",
+        "Your favorite team has an upcoming match!",
+        "New sports gear now available.",
+      ],
+      'Music': [
+        "Your favorite artist just dropped a new album!",
+        "Tickets for an upcoming concert are now on sale.",
+        "Discover this week's top charts.",
+      ],
+      'Travel': [
+        "Dreaming of a getaway? Check out our latest travel deals!",
+        "Explore new destinations with our travel guide.",
+        "Last-minute vacation packages now available!",
+      ],
+      'Food': [
+        "Hungry? Discover new recipes for your favorite cuisine.",
+        "Top-rated restaurants in your area with special offers!",
+        "New cooking tutorial: Learn to make gourmet dishes at home.",
+      ],
+    };
+
+    List<String> messages = interestMessages[interest] ?? ["We have some exciting news for you!"];
+    return messages[DateTime.now().second % messages.length];
+  }
+
+  Future<void> _showPersonalizedNotification(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      _personalizedChannelId,
+      _personalizedChannelName,
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: true,
+    );
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await _flutterLocalNotificationsPlugin.show(
+      0, // Notification ID
+      title,
+      body,
+      platformChannelSpecifics,
+    );
+
+    await _saveNotificationToFirestore(title, body);
   }
 
   Future<void> sendPromotionalNotification() async {
@@ -193,6 +265,7 @@ class NotificationService {
       print('Error sending update notification: $e');
     }
   }
+
   Future<void> deleteNotification(String notificationId) async {
     final user = _auth.currentUser;
     if (user != null) {
@@ -203,9 +276,27 @@ class NotificationService {
             .collection('notifications')
             .doc(notificationId)
             .delete();
+        print('Notification deleted successfully');
       } catch (e) {
         print('Error deleting notification: $e');
+        throw e;
       }
+    }
+  }
+
+  Future<void> sendBulkNotifications(String title, String body) async {
+    try {
+      QuerySnapshot users = await _firestore.collection('users').where('receiveNotifications', isEqualTo: true).get();
+
+      for (var userDoc in users.docs) {
+        String fcmToken = userDoc.get('fcmToken');
+        await _fcm.sendMessage(
+          to: fcmToken,
+          data: {'title': title, 'body': body},
+        );
+      }
+    } catch (e) {
+      print('Error sending bulk notifications: $e');
     }
   }
 }

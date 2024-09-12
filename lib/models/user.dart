@@ -1,31 +1,80 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class User {
   final String id;
+  final String name;
+  final String email;
   final bool receivePromotions;
+  final bool receiveUpdates;
+  final bool receiveNotifications;
   final String fcmToken;
+  final List<String> interests;
+  final DateTime lastLogin;
   final DateTime createdAt;
 
   User({
     required this.id,
+    required this.name,
+    required this.email,
     required this.receivePromotions,
+    required this.receiveUpdates,
+    required this.receiveNotifications,
     required this.fcmToken,
-    DateTime? createdAt,
-  }) : createdAt = createdAt ?? DateTime.now();
+    required this.interests,
+    required this.lastLogin,
+    required this.createdAt,
+  });
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
       id: map['id'] as String? ?? '',
+      name: map['name'] as String? ?? '',
+      email: map['email'] as String? ?? '',
       receivePromotions: map['receivePromotions'] as bool? ?? false,
+      receiveUpdates: map['receiveUpdates'] as bool? ?? false,
+      receiveNotifications: map['receiveNotifications'] as bool? ?? false,
       fcmToken: map['fcmToken'] as String? ?? '',
-      createdAt: map['createdAt'] != null ? DateTime.parse(map['createdAt']) : null,
+      interests: List<String>.from(map['interests'] ?? []),
+      lastLogin: (map['lastLogin'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'name': name,
+      'email': email,
       'receivePromotions': receivePromotions,
+      'receiveUpdates': receiveUpdates,
+      'receiveNotifications': receiveNotifications,
       'fcmToken': fcmToken,
-      'createdAt': createdAt.toIso8601String(),
+      'interests': interests,
+      'lastLogin': Timestamp.fromDate(lastLogin),
+      'createdAt': Timestamp.fromDate(createdAt),
     };
+  }
+
+  User copyWith({
+    String? name,
+    bool? receivePromotions,
+    bool? receiveUpdates,
+    bool? receiveNotifications,
+    String? fcmToken,
+    List<String>? interests,
+    DateTime? lastLogin,
+  }) {
+    return User(
+      id: this.id,
+      name: name ?? this.name,
+      email: this.email,
+      receivePromotions: receivePromotions ?? this.receivePromotions,
+      receiveUpdates: receiveUpdates ?? this.receiveUpdates,
+      receiveNotifications: receiveNotifications ?? this.receiveNotifications,
+      fcmToken: fcmToken ?? this.fcmToken,
+      interests: interests ?? this.interests,
+      lastLogin: lastLogin ?? this.lastLogin,
+      createdAt: this.createdAt,
+    );
   }
 }

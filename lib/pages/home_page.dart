@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -61,6 +60,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       if (message.notification != null) {
         print('Notification: ${message.notification}');
         _notificationService.sendPersonalizedNotification(
+          userId: _authService.getCurrentUser()!.uid,
           title: message.notification!.title ?? '',
           body: message.notification!.body ?? '',
         );
@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         try {
           DocumentReference userRef = _firestore.collection('users').doc(userId);
           DocumentSnapshot userDoc = await userRef.get();
-          
+
           if (userDoc.exists) {
             await userRef.update({
               'fcmToken': token,
@@ -213,7 +213,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     'Send Personalized Notification',
                     Icons.person,
                     () async {
-                      await _notificationService.sendPersonalizedNotification(title: '', body: '');
+                      await _notificationService.sendPersonalizedNotification(
+                        userId: _authService.getCurrentUser()?.uid ?? '',
+                        title: 'Test Title',
+                        body: 'This is a test personalized notification',
+                      );
                       _showSnackBar('Personalized notification sent');
                     },
                   ),
