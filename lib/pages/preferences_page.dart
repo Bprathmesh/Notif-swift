@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mypushnotifications/models/user.dart' as AppUser;
 import 'package:mypushnotifications/services/notification_service.dart';
+import 'package:mypushnotifications/services/auth_service.dart';
+import 'package:mypushnotifications/services/firebase_service.dart';
 
 class PreferencesPage extends StatefulWidget {
   @override
@@ -13,6 +15,8 @@ class _PreferencesPageState extends State<PreferencesPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NotificationService _notificationService = NotificationService();
+  final AuthService _authService = AuthService();
+  final FirebaseService _firebaseService = FirebaseService();
   
   late AppUser.User _user;
   bool _isLoading = true;
@@ -70,13 +74,21 @@ class _PreferencesPageState extends State<PreferencesPage> {
       _user = _user.copyWith(lastLogin: DateTime.now());
       
       await _firestore.collection('users').doc(_user.id).update(_user.toMap());
+
+      // Update user preferences using FirebaseService
+      await _firebaseService.saveUserPreferences(_user.id, _user.receivePromotions);
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Preferences saved successfully')),
       );
 
       // If notifications are enabled, send a test notification
       if (_user.receiveNotifications) {
-        await _notificationService.sendPersonalizedNotification(userId: '', title: '', body: '');
+        await _notificationService.sendPersonalizedNotification(
+          userId: _user.id,
+          title: 'Preferences Updated',
+          body: 'Your notification preferences have been updated.',
+        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mypushnotifications/services/auth_service.dart';
 import 'package:mypushnotifications/services/notification_service.dart';
+import 'package:mypushnotifications/services/firebase_service.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,6 +16,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _authService = AuthService();
   final NotificationService _notificationService = NotificationService();
+  final FirebaseService _firebaseService = FirebaseService();
   bool _receiveNotifications = false;
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -39,83 +41,20 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   Future<void> _initializeNotifications() async {
     try {
-      NotificationSettings settings = await _firebaseMessaging.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
-
-      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        print('User granted permission');
-        String? token = await _firebaseMessaging.getToken();
-        print('FCM Token: $token');
-
-        await _saveTokenToFirestore(token);
-        await _firebaseMessaging.subscribeToTopic('test_notifications');
-      } else {
-        print('User declined or has not accepted permission');
-      }
-
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        print('Message data: ${message.data}');
-        if (message.notification != null) {
-          print('Notification: ${message.notification}');
-          _notificationService.sendPersonalizedNotification(
-            userId: _authService.getCurrentUser()?.uid ?? '',
-            title: message.notification!.title ?? '',
-            body: message.notification!.body ?? '',
-          );
-        }
-      });
-
-      _receiveNotifications = await _getCurrentNotificationSettings();
-      setState(() {});
-    } catch (e) {
-      print('Error initializing notifications: $e');
-    }
-  }
-
-  Future<void> _saveTokenToFirestore(String? token) async {
-    if (token != null) {
+      await _notificationService.init();
       String? userId = _authService.getCurrentUser()?.uid;
       if (userId != null) {
-        try {
-          DocumentReference userRef = _firestore.collection('users').doc(userId);
-          DocumentSnapshot userDoc = await userRef.get();
-
-          if (userDoc.exists) {
-            await userRef.update({
-              'fcmToken': token,
-            });
-          } else {
-            await userRef.set({
-              'fcmToken': token,
-              'name': 'User', // Default name
-              'receivePromotions': false,
-              'receiveUpdates': false,
-              'receiveNotifications': false,
-            });
-          }
-        } catch (e) {
-          print('Error saving FCM token to Firestore: $e');
-        }
-      }
-    }
-  }
-
-  Future<bool> _getCurrentNotificationSettings() async {
-    String? userId = _authService.getCurrentUser()?.uid;
-    if (userId != null) {
-      try {
         DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
         if (userDoc.exists) {
-          return (userDoc.data() as Map<String, dynamic>)['receiveNotifications'] ?? false;
+          setState(() {
+            _receiveNotifications = userDoc.get('receiveNotifications') ?? false;
+          });
         }
-      } catch (e) {
-        print('Error getting notification settings: $e');
       }
+    } catch (e) {
+      print('Error initializing notifications: $e');
+      _showSnackBar('Error initializing notifications. Please try again later.');
     }
-    return false;
   }
 
   Future<void> _toggleNotifications(bool value) async {
@@ -137,6 +76,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         }
       } catch (e) {
         print('Error updating notification settings: $e');
+        _showSnackBar('Error updating notification settings. Please try again.');
       }
     }
   }
@@ -147,6 +87,63 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       Navigator.pushReplacementNamed(context, '/sign_in');
     } catch (e) {
       print('Error signing out: $e');
+      _showSnackBar('Error signing out. Please try again.');
+    }
+  }
+
+  Future<void> _sendPersonalizedNotification() async {
+    try {
+      String? userId = _authService.getCurrentUser()?.uid;
+      if (userId != null) {
+        await _notificationService.sendPersonalizedNotification(
+          userId: userId,
+          title: 'Personalized Notification',
+          body: 'This is a test personalized notification',
+        );
+        _showSnackBar('Personalized notification sent');
+      } else {
+        _showSnackBar('User not logged in. Cannot send notification.');
+      }
+    } catch (e) {
+      print('Error sending personalized notification: $e');
+      _showSnackBar('Error sending personalized notification. Please try again.');
+    }
+  }
+
+  Future<void> _sendPromotionalNotification() async {
+    try {
+      await _notificationService.sendPromotionalNotification();
+      _showSnackBar('Promotional notification sent');
+    } catch (e) {
+      print('Error sending promotional notification: $e');
+      _showSnackBar('Error sending promotional notification. Please try again.');
+    }
+  }
+
+  Future<void> _sendUpdateNotification() async {
+    try {
+      await _notificationService.sendUpdateNotification();
+      _showSnackBar('Update notification sent');
+    } catch (e) {
+      print('Error sending update notification: $e');
+      _showSnackBar('Error sending update notification. Please try again.');
+    }
+  }
+
+  Future<void> _scheduleNotification() async {
+    try {
+      await _notificationService.init(); // Ensure initialization
+      DateTime scheduledTime = DateTime.now().add(Duration(minutes: 1));
+      String? userId = _authService.getCurrentUser()?.uid;
+      if (userId != null) {
+        await _notificationService.scheduleNotification(userId, scheduledTime);
+        _showSnackBar('Notification scheduled for 1 minute from now');
+      } else {
+        _showSnackBar('User not logged in. Cannot schedule notification.');
+      }
+    } catch (e) {
+      print('Error scheduling notification: $e');
+      _showSnackBar('Error scheduling notification. Please try again.');
     }
   }
 
@@ -220,47 +217,25 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   _buildNotificationButton(
                     'Send Personalized Notification',
                     Icons.person,
-                    () async {
-                      try {
-                        await _notificationService.sendPersonalizedNotification(
-                          userId: _authService.getCurrentUser()?.uid ?? '',
-                          title: 'Test Title',
-                          body: 'This is a test personalized notification',
-                        );
-                        _showSnackBar('Personalized notification sent');
-                      } catch (e) {
-                        _showSnackBar('Error sending personalized notification');
-                        print('Error sending personalized notification: $e');
-                      }
-                    },
+                    _sendPersonalizedNotification,
                   ),
                   SizedBox(height: 10),
                   _buildNotificationButton(
                     'Send Promotional Notification',
                     Icons.local_offer,
-                    () async {
-                      try {
-                        await _notificationService.sendPromotionalNotification();
-                        _showSnackBar('Promotional notification sent');
-                      } catch (e) {
-                        _showSnackBar('Error sending promotional notification');
-                        print('Error sending promotional notification: $e');
-                      }
-                    },
+                    _sendPromotionalNotification,
                   ),
                   SizedBox(height: 10),
                   _buildNotificationButton(
                     'Send Update Notification',
                     Icons.update,
-                    () async {
-                      try {
-                        await _notificationService.sendUpdateNotification();
-                        _showSnackBar('Update notification sent');
-                      } catch (e) {
-                        _showSnackBar('Error sending update notification');
-                        print('Error sending update notification: $e');
-                      }
-                    },
+                    _sendUpdateNotification,
+                  ),
+                  SizedBox(height: 10),
+                  _buildNotificationButton(
+                    'Schedule Notification',
+                    Icons.schedule,
+                    _scheduleNotification,
                   ),
                 ],
               ),

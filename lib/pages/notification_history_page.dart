@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mypushnotifications/services/notification_service.dart';
+import 'package:intl/intl.dart';
 
 class NotificationHistoryPage extends StatefulWidget {
   @override
@@ -72,12 +73,19 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
                 },
                 child: ListTile(
                   title: Text(notification['title'] ?? 'No title'),
-                  subtitle: Text(notification['body'] ?? 'No body'),
-                  trailing: Text(
-                    notification['timestamp'] != null
-                        ? notification['timestamp'].toDate().toString()
-                        : 'No date',
-                    style: TextStyle(fontSize: 12),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(notification['body'] ?? 'No body'),
+                      Text(
+                        _getFormattedDate(notification),
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  trailing: Icon(
+                    _getNotificationIcon(notification),
+                    color: _getNotificationColor(notification),
                   ),
                 ),
               );
@@ -86,6 +94,23 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
         },
       ),
     );
+  }
+
+  String _getFormattedDate(DocumentSnapshot notification) {
+    if (notification['status'] == 'scheduled' && notification['scheduledTime'] != null) {
+      return 'Scheduled for: ${DateFormat('yyyy-MM-dd HH:mm').format(notification['scheduledTime'].toDate())}';
+    } else if (notification['timestamp'] != null) {
+      return 'Sent: ${DateFormat('yyyy-MM-dd HH:mm').format(notification['timestamp'].toDate())}';
+    }
+    return 'No date';
+  }
+
+  IconData _getNotificationIcon(DocumentSnapshot notification) {
+    return notification['status'] == 'scheduled' ? Icons.schedule : Icons.notifications;
+  }
+
+  Color _getNotificationColor(DocumentSnapshot notification) {
+    return notification['status'] == 'scheduled' ? Colors.orange : Colors.blue;
   }
 
   void _deleteNotification(String notificationId) {

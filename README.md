@@ -1,4 +1,3 @@
-<<<<<<<<<<<<<<  ✨ Codeium Command 🌟  >>>>>>>>>>>>>>>>
 # Push Notification App
 
 This Flutter application demonstrates the implementation of push notifications with personalized content based on user preferences, utilizing Firebase Cloud Messaging (FCM) and local notifications with timezone handling.
@@ -27,9 +26,6 @@ This Flutter application demonstrates the implementation of push notifications w
 
 ## Key Components
 
-- **Authentication**: Firebase Authentication is used for user registration and sign-in.
-- **Database**: Cloud Firestore stores user preferences and notification history.
-- **Push Notifications**: Firebase Cloud Messaging (FCM) is used for sending and receiving push notifications, and local notifications are managed with Flutter Local Notifications.
 - **Firebase Authentication**: Used for user registration and sign-in.
 - **Cloud Firestore**: Stores user preferences and notification history.
 - **Firebase Cloud Messaging (FCM)**: Used for sending and receiving push notifications.
@@ -85,4 +81,3 @@ This Flutter application demonstrates the implementation of push notifications w
 3. Test on both Android and iOS for full functionality, especially notifications.
 
 
-<<<<<<<  d8d871c5-3f94-42f2-a777-b795c73fe471  >>>>>>>
