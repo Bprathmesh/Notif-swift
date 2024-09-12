@@ -3,6 +3,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mypushnotifications/models/user.dart' as AppUser;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest_all.dart' as tz_data;
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -36,22 +38,37 @@ class NotificationService {
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
       String? token = await _fcm.getToken();
-      await _saveTokenToFirestore(token);
+      if (token != null) {
+        await _saveTokenToFirestore(token);
+      }
 
-      _fcm.onTokenRefresh.listen(_saveTokenToFirestore);
+      _fcm.onTokenRefresh.listen((token) => _saveTokenToFirestore(token));
 
-      // Create a notification channel for personalized notifications
-      const AndroidNotificationChannel personalizedChannel = AndroidNotificationChannel(
-        _personalizedChannelId,
-        _personalizedChannelName,
-        importance: Importance.high,
-      );
-      await _flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-          ?.createNotificationChannel(personalizedChannel);
+      // Create notification channels
+      await _createNotificationChannels();
     } catch (e) {
       print('Error initializing NotificationService: $e');
     }
+  }
+
+  Future<void> _createNotificationChannels() async {
+    const AndroidNotificationChannel defaultChannel = AndroidNotificationChannel(
+      _defaultChannelId,
+      _defaultChannelName,
+      importance: Importance.high,
+    );
+
+    const AndroidNotificationChannel personalizedChannel = AndroidNotificationChannel(
+      _personalizedChannelId,
+      _personalizedChannelName,
+      importance: Importance.high,
+    );
+
+    await _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(defaultChannel);
+
+    await _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(personalizedChannel);
   }
 
   void _handleForegroundMessage(RemoteMessage message) {
@@ -94,18 +111,16 @@ class NotificationService {
     }
   }
 
-  Future<void> _saveTokenToFirestore(String? token) async {
-    if (token != null) {
-      final user = _auth.currentUser;
-      if (user != null) {
-        try {
-          await _firestore
-              .collection('users')
-              .doc(user.uid)
-              .update({'fcmToken': token});
-        } catch (e) {
-          print('Error saving FCM token to Firestore: $e');
-        }
+  Future<void> _saveTokenToFirestore(String token) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      try {
+        await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .update({'fcmToken': token});
+      } catch (e) {
+        print('Error saving FCM token to Firestore: $e');
       }
     }
   }
@@ -129,31 +144,42 @@ class NotificationService {
     }
   }
 
-  Future<void> sendPersonalizedNotification({required String title, required String body, required String userId}) async {
-    try {
-      final user = _auth.currentUser;
-      if (user != null) {
-        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
-        
-        if (userDoc.exists) {
-          AppUser.User appUser = AppUser.User.fromMap(userDoc.data() as Map<String, dynamic>);
-
-          if (appUser.receiveNotifications) {
-            String title = 'Hello ${appUser.name}!';
-            String body = _getPersonalizedBody(appUser);
-
-            await _showPersonalizedNotification(title, body);
-          } else {
-            print('User has not opted in for notifications');
-          }
-        } else {
-          print('User document does not exist');
-        }
-      }
-    } catch (e) {
-      print('Error sending personalized notification: $e');
+  Future<void> sendPersonalizedNotification({required String userId, required String title, required String body}) async {
+  try {
+    final user = _auth.currentUser;
+    if (user == null) {
+      print('No user is currently logged in.');
+      return;
     }
+
+    // Check if userId is non-empty and correct
+    if (userId.isEmpty) {
+      print('User ID cannot be empty.');
+      return;
+    }
+
+    // Fetch the user document from Firestore
+    DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+    
+    if (userDoc.exists) {
+      AppUser.User appUser = AppUser.User.fromMap(userDoc.data() as Map<String, dynamic>);
+
+      if (appUser.receiveNotifications) {
+        String title = 'Hello ${appUser.name}!';
+        String body = _getPersonalizedBody(appUser);
+
+        await _showPersonalizedNotification(title, body);
+      } else {
+        print('User has not opted in for notifications');
+      }
+    } else {
+      print('User document does not exist');
+    }
+  } catch (e) {
+    print('Error sending personalized notification: $e');
   }
+}
+
 
   String _getPersonalizedBody(AppUser.User user) {
     if (user.interests.isEmpty) {
@@ -249,9 +275,9 @@ class NotificationService {
         if (userDoc.exists) {
           Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
 
-          if (userData['receiveUpdates'] == true && userData['receiveNotifications'] == true) {
-            String title = 'New Update Available';
-            String body = '${userData['name'] ?? 'User'}, we have some exciting updates for you!';
+          if (userData['receiveUpdates'] == true) {
+            String title = 'App Update';
+            String body = 'We have some exciting new features for you. Update now to explore!';
 
             await _showNotification(title, body);
           } else {
@@ -267,36 +293,37 @@ class NotificationService {
   }
 
   Future<void> deleteNotification(String notificationId) async {
-    final user = _auth.currentUser;
-    if (user != null) {
-      try {
-        await _firestore
-            .collection('users')
-            .doc(user.uid)
-            .collection('notifications')
-            .doc(notificationId)
-            .delete();
-        print('Notification deleted successfully');
-      } catch (e) {
-        print('Error deleting notification: $e');
-        throw e;
-      }
-    }
+  if (notificationId.isEmpty) {
+    print('Notification ID cannot be empty.');
+    return;
   }
 
-  Future<void> sendBulkNotifications(String title, String body) async {
-    try {
-      QuerySnapshot users = await _firestore.collection('users').where('receiveNotifications', isEqualTo: true).get();
+  final user = _auth.currentUser;
+  if (user == null) {
+    print('No user logged in.');
+    return;
+  }
 
-      for (var userDoc in users.docs) {
-        String fcmToken = userDoc.get('fcmToken');
-        await _fcm.sendMessage(
-          to: fcmToken,
-          data: {'title': title, 'body': body},
-        );
-      }
+  try {
+    await _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('notifications')
+        .doc(notificationId)
+        .delete();
+    print('Notification with ID $notificationId deleted successfully.');
+  } catch (e) {
+    print('Error deleting notification: $e');
+  }
+}
+
+
+  Future<void> cancelLocalNotification(int notificationId) async {
+    try {
+      await _flutterLocalNotificationsPlugin.cancel(notificationId);
+      print('Local notification with ID $notificationId cancelled successfully.');
     } catch (e) {
-      print('Error sending bulk notifications: $e');
+      print('Error cancelling local notification: $e');
     }
   }
 }

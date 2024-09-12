@@ -27,7 +27,12 @@ class _SignInPageState extends State<SignInPage> {
         Navigator.pushReplacementNamed(context, '/home');
       }
     } catch (e) {
-      print('Sign-in error: $e');
+      // Handle sign-in errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Sign-in error: $e'),
+        ),
+      );
     } finally {
       setState(() {
         _loading = false;
@@ -40,19 +45,42 @@ class _SignInPageState extends State<SignInPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Sign In'),
+        elevation: 0,
+        backgroundColor:const Color.fromARGB(255, 177, 68, 255),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text(
+              'Welcome Back!',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
+              decoration: InputDecoration(
+                labelText: 'Email',
+                prefixIcon: Icon(Icons.email),
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
+                ),
+              ),
               keyboardType: TextInputType.emailAddress,
             ),
+            SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
+              decoration: InputDecoration(
+                labelText: 'Password',
+                prefixIcon: Icon(Icons.lock),
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: const Color(0xD2FF4444), width: 2.0),
+                ),
+              ),
               obscureText: true,
             ),
             SizedBox(height: 20),
@@ -60,13 +88,27 @@ class _SignInPageState extends State<SignInPage> {
                 ? CircularProgressIndicator()
                 : ElevatedButton(
                     onPressed: _signIn,
-                    child: Text('Sign In'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 177, 68, 255),
+                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Text(
+                      'Sign In',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
                   ),
+            SizedBox(height: 16),
             TextButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/register');
               },
               child: Text('Create an account'),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color.fromARGB(255, 177, 68, 255),
+              ),
             ),
           ],
         ),

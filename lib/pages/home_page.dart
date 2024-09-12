@@ -38,37 +38,41 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Future<void> _initializeNotifications() async {
-    NotificationSettings settings = await _firebaseMessaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    try {
+      NotificationSettings settings = await _firebaseMessaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission');
-      String? token = await _firebaseMessaging.getToken();
-      print('FCM Token: $token');
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        print('User granted permission');
+        String? token = await _firebaseMessaging.getToken();
+        print('FCM Token: $token');
 
-      await _saveTokenToFirestore(token);
-      await _firebaseMessaging.subscribeToTopic('test_notifications');
-    } else {
-      print('User declined or has not accepted permission');
-    }
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Message data: ${message.data}');
-      if (message.notification != null) {
-        print('Notification: ${message.notification}');
-        _notificationService.sendPersonalizedNotification(
-          userId: _authService.getCurrentUser()!.uid,
-          title: message.notification!.title ?? '',
-          body: message.notification!.body ?? '',
-        );
+        await _saveTokenToFirestore(token);
+        await _firebaseMessaging.subscribeToTopic('test_notifications');
+      } else {
+        print('User declined or has not accepted permission');
       }
-    });
 
-    _receiveNotifications = await _getCurrentNotificationSettings();
-    setState(() {});
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        print('Message data: ${message.data}');
+        if (message.notification != null) {
+          print('Notification: ${message.notification}');
+          _notificationService.sendPersonalizedNotification(
+            userId: _authService.getCurrentUser()?.uid ?? '',
+            title: message.notification!.title ?? '',
+            body: message.notification!.body ?? '',
+          );
+        }
+      });
+
+      _receiveNotifications = await _getCurrentNotificationSettings();
+      setState(() {});
+    } catch (e) {
+      print('Error initializing notifications: $e');
+    }
   }
 
   Future<void> _saveTokenToFirestore(String? token) async {
@@ -125,21 +129,25 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         await _firestore.collection('users').doc(userId).update({
           'receiveNotifications': value,
         });
+
+        if (value) {
+          await _firebaseMessaging.subscribeToTopic('test_notifications');
+        } else {
+          await _firebaseMessaging.unsubscribeFromTopic('test_notifications');
+        }
       } catch (e) {
         print('Error updating notification settings: $e');
       }
     }
-
-    if (value) {
-      await _firebaseMessaging.subscribeToTopic('test_notifications');
-    } else {
-      await _firebaseMessaging.unsubscribeFromTopic('test_notifications');
-    }
   }
 
   Future<void> _signOut() async {
-    await _authService.signOut();
-    Navigator.pushReplacementNamed(context, '/sign_in');
+    try {
+      await _authService.signOut();
+      Navigator.pushReplacementNamed(context, '/sign_in');
+    } catch (e) {
+      print('Error signing out: $e');
+    }
   }
 
   @override
@@ -213,12 +221,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     'Send Personalized Notification',
                     Icons.person,
                     () async {
-                      await _notificationService.sendPersonalizedNotification(
-                        userId: _authService.getCurrentUser()?.uid ?? '',
-                        title: 'Test Title',
-                        body: 'This is a test personalized notification',
-                      );
-                      _showSnackBar('Personalized notification sent');
+                      try {
+                        await _notificationService.sendPersonalizedNotification(
+                          userId: _authService.getCurrentUser()?.uid ?? '',
+                          title: 'Test Title',
+                          body: 'This is a test personalized notification',
+                        );
+                        _showSnackBar('Personalized notification sent');
+                      } catch (e) {
+                        _showSnackBar('Error sending personalized notification');
+                        print('Error sending personalized notification: $e');
+                      }
                     },
                   ),
                   SizedBox(height: 10),
@@ -226,8 +239,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     'Send Promotional Notification',
                     Icons.local_offer,
                     () async {
-                      await _notificationService.sendPromotionalNotification();
-                      _showSnackBar('Promotional notification sent');
+                      try {
+                        await _notificationService.sendPromotionalNotification();
+                        _showSnackBar('Promotional notification sent');
+                      } catch (e) {
+                        _showSnackBar('Error sending promotional notification');
+                        print('Error sending promotional notification: $e');
+                      }
                     },
                   ),
                   SizedBox(height: 10),
@@ -235,8 +253,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     'Send Update Notification',
                     Icons.update,
                     () async {
-                      await _notificationService.sendUpdateNotification();
-                      _showSnackBar('Update notification sent');
+                      try {
+                        await _notificationService.sendUpdateNotification();
+                        _showSnackBar('Update notification sent');
+                      } catch (e) {
+                        _showSnackBar('Error sending update notification');
+                        print('Error sending update notification: $e');
+                      }
                     },
                   ),
                 ],
