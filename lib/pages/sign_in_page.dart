@@ -110,7 +110,7 @@ class _SignInPageState extends State<SignInPage> {
               style: TextButton.styleFrom(
                 foregroundColor: const Color.fromARGB(255, 177, 68, 255),
               ),
-              child: Text('Create an account'),
+              child: const Text('Create an account'),
             ),
           ],
         ),

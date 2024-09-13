@@ -4,8 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mypushnotifications/services/notification_service.dart';
 import 'package:intl/intl.dart';
 import 'package:mypushnotifications/generated/l10n.dart';
+import 'package:provider/provider.dart';
+import 'package:mypushnotifications/providers/theme_provider.dart';
 
 class NotificationHistoryPage extends StatefulWidget {
+  const NotificationHistoryPage({super.key});
+
   @override
   _NotificationHistoryPageState createState() => _NotificationHistoryPageState();
 }
@@ -35,17 +39,31 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
     }
   }
 
+  void _toggleTheme() {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    themeProvider.toggleTheme();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(S.of(context).notificationHistoryPage),
+        actions: [
+          IconButton(
+            icon: Icon(themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+            onPressed: _toggleTheme,
+            tooltip: 'Change Theme',
+          ),
+        ],
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _notificationsStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
@@ -65,28 +83,44 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
                 background: Container(
                   color: Colors.red,
                   alignment: Alignment.centerRight,
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Icon(Icons.delete, color: Colors.white),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.delete, color: Colors.white),
                 ),
                 direction: DismissDirection.endToStart,
                 onDismissed: (direction) {
                   _deleteNotification(notification.id);
                 },
-                child: ListTile(
-                  title: Text(notification['title'] ?? S.of(context).noTitle),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(notification['body'] ?? S.of(context).noBody),
-                      Text(
-                        _getFormattedDate(notification),
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                child: Card(
+                  elevation: 2,
+                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: ListTile(
+                    title: Text(
+                      notification['title'] ?? S.of(context).noTitle,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                       ),
-                    ],
-                  ),
-                  trailing: Icon(
-                    _getNotificationIcon(notification),
-                    color: _getNotificationColor(notification),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          notification['body'] ?? S.of(context).noBody,
+                          style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+                        ),
+                        Text(
+                          _getFormattedDate(notification),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                          ),
+                        ),
+                      ],
+                    ),
+                    trailing: Icon(
+                      _getNotificationIcon(notification),
+                      color: _getNotificationColor(notification),
+                    ),
                   ),
                 ),
               );
@@ -126,15 +160,20 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
   }
 
   Color _getNotificationColor(DocumentSnapshot notification) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     try {
       if (notification.data() is Map<String, dynamic>) {
         final data = notification.data() as Map<String, dynamic>;
-        return data['status'] == 'scheduled' ? Colors.orange : Colors.blue;
+        if (data['status'] == 'scheduled') {
+          return themeProvider.isDarkMode ? Colors.orangeAccent : Colors.orange;
+        } else {
+          return themeProvider.isDarkMode ? Colors.lightBlueAccent : Colors.blue;
+        }
       }
     } catch (e) {
       print('Error getting notification color: $e');
     }
-    return Colors.blue;
+    return themeProvider.isDarkMode ? Colors.lightBlueAccent : Colors.blue;
   }
 
   void _deleteNotification(String notificationId) {

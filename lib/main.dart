@@ -10,12 +10,19 @@ import 'pages/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'services/notification_service.dart';
 import 'phoenix.dart';
+import 'package:provider/provider.dart';
+import 'package:mypushnotifications/providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await NotificationService().init();
-  runApp(Phoenix(child: MyApp()));
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: const Phoenix(child: MyApp()),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -23,27 +30,31 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Notification App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      localizationsDelegates: const [
-        S.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: S.delegate.supportedLocales,
-      locale: const Locale('es'),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => Wrapper(),
-        '/home': (context) => HomePage(),
-        '/sign_in': (context) => SignInPage(),
-        '/register': (context) => RegisterPage(),
-        '/notification_history': (context) => NotificationHistoryPage(),
-        '/preferences': (context) => PreferencesPage(),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: 'Notification App',
+          theme: themeProvider.lightTheme,
+          darkTheme: themeProvider.darkTheme,
+          themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          localizationsDelegates: const [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: S.delegate.supportedLocales,
+          locale: const Locale('en'),
+          initialRoute: '/',
+          routes: {
+            '/': (context) => const Wrapper(),
+            '/home': (context) => const HomePage(),
+            '/sign_in': (context) => const SignInPage(),
+            '/register': (context) => const RegisterPage(),
+            '/notification_history': (context) => NotificationHistoryPage(),
+            '/preferences': (context) => const PreferencesPage(),
+          },
+        );
       },
     );
   }

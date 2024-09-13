@@ -30,6 +30,7 @@
   "noBody": "No body",
   "noNotifications": "No notifications",
   "notificationHistoryPage": "Notification History",
+  "changeTheme": "Change Theme",
   "sent": "Sent: {format}",
   "@sent": {
     "placeholders": {

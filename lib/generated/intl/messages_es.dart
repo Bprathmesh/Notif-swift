@@ -30,6 +30,7 @@ class MessageLookup extends MessageLookupByLibrary {
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "changeLanguage":
             MessageLookupByLibrary.simpleMessage("Cambiar Idioma"),
+        "changeTheme": MessageLookupByLibrary.simpleMessage("Cambiar Tema"),
         "error": m0,
         "errorInitializingNotifications": MessageLookupByLibrary.simpleMessage(
             "Error al iniciar las notificaciones. Por favor, inténtelo de nuevo más tarde."),

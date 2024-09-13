@@ -30,6 +30,7 @@
   "noBody": "Sin cuerpo",
   "noNotifications": "Sin notificaciones",
   "notificationHistoryPage": "Historial de Notificaciones",
+  "changeTheme": "Cambiar Tema",
   "sent": "Enviado: {format}",
   "@sent": {
     "placeholders": {

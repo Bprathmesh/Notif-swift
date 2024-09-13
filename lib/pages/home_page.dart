@@ -9,6 +9,8 @@ import 'package:mypushnotifications/services/firebase_service.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:mypushnotifications/generated/l10n.dart';
 import '../phoenix.dart';
+import 'package:provider/provider.dart';
+import 'package:mypushnotifications/providers/theme_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -55,23 +57,32 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     Phoenix.rebirth(context);
   }
 
+  void _toggleTheme() {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    themeProvider.toggleTheme();
+  }
+
   Future<void> _initializeNotifications() async {
-    try {
-      await _notificationService.init();
-      String? userId = _authService.getCurrentUser()?.uid;
-      if (userId != null) {
-        DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
-        if (userDoc.exists) {
-          setState(() {
-            _receiveNotifications = userDoc.get('receiveNotifications') ?? false;
-          });
-        }
+  try {
+    await _notificationService.init();
+    String? userId = _authService.getCurrentUser()?.uid;
+    if (userId != null) {
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+      if (userDoc.exists && mounted) {  // Add a check for mounted here
+        setState(() {
+          _receiveNotifications = userDoc.get('receiveNotifications') ?? false;
+        });
       }
-    } catch (e) {
-      print('Error initializing notifications: $e');
-      _showSnackBar(S.of(context).errorInitializingNotifications);
+    }
+  } catch (e) {
+    print('Error initializing notifications: $e');
+    if (mounted) {  // Add a check for mounted here as well
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(S.of(context).errorInitializingNotifications)),
+      );
     }
   }
+}
 
   Future<void> _toggleNotifications(bool value) async {
     setState(() {
@@ -165,10 +176,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(S.of(context).homePage, style: const TextStyle(fontWeight: FontWeight.bold)),
         actions: [
+          IconButton(
+            icon: Icon(themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+            onPressed: _toggleTheme,
+            tooltip: S.of(context).changeTheme,
+          ),
           IconButton(
             icon: const Icon(Icons.language),
             onPressed: _toggleLanguage,
@@ -195,7 +213,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Theme.of(context).primaryColor, Colors.white],
+              colors: [
+                Theme.of(context).primaryColor,
+                themeProvider.isDarkMode ? Colors.black : Colors.white,
+              ],
             ),
           ),
           child: AnimationLimiter(
@@ -266,6 +287,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ),
     );
   }
+
   Widget _buildNotificationButton(String text, IconData icon, VoidCallback onPressed) {
     return ElevatedButton.icon(
       icon: Icon(icon),

@@ -7,6 +7,8 @@ import 'package:mypushnotifications/models/user.dart' as AppUser;
 import 'package:mypushnotifications/services/notification_service.dart';
 import 'package:mypushnotifications/services/auth_service.dart';
 import 'package:mypushnotifications/services/firebase_service.dart';
+import 'package:provider/provider.dart';
+import 'package:mypushnotifications/providers/theme_provider.dart';
 
 class PreferencesPage extends StatefulWidget {
   const PreferencesPage({super.key});
@@ -105,46 +107,72 @@ class _PreferencesPageState extends State<PreferencesPage> {
     });
   }
 
+  void _toggleTheme() {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    themeProvider.toggleTheme();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Preferences'),
+        actions: [
+          IconButton(
+            icon: Icon(themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+            onPressed: _toggleTheme,
+            tooltip: 'Change Theme',
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               children: [
-                ListTile(
-                  title: const Text('Email'),
-                  subtitle: Text(_user.email),
+                Card(
+                  margin: const EdgeInsets.all(8),
+                  child: ListTile(
+                    title: const Text('Email'),
+                    subtitle: Text(_user.email),
+                  ),
                 ),
-                SwitchListTile(
-                  title: const Text('Receive Notifications'),
-                  value: _user.receiveNotifications,
-                  onChanged: (value) {
-                    setState(() {
-                      _user = _user.copyWith(receiveNotifications: value);
-                    });
-                  },
+                Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: SwitchListTile(
+                    title: const Text('Receive Notifications'),
+                    value: _user.receiveNotifications,
+                    onChanged: (value) {
+                      setState(() {
+                        _user = _user.copyWith(receiveNotifications: value);
+                      });
+                    },
+                  ),
                 ),
-                SwitchListTile(
-                  title: const Text('Receive Promotions'),
-                  value: _user.receivePromotions,
-                  onChanged: (value) {
-                    setState(() {
-                      _user = _user.copyWith(receivePromotions: value);
-                    });
-                  },
+                Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: SwitchListTile(
+                    title: const Text('Receive Promotions'),
+                    value: _user.receivePromotions,
+                    onChanged: (value) {
+                      setState(() {
+                        _user = _user.copyWith(receivePromotions: value);
+                      });
+                    },
+                  ),
                 ),
-                SwitchListTile(
-                  title: const Text('Receive Updates'),
-                  value: _user.receiveUpdates,
-                  onChanged: (value) {
-                    setState(() {
-                      _user = _user.copyWith(receiveUpdates: value);
-                    });
-                  },
+                Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: SwitchListTile(
+                    title: const Text('Receive Updates'),
+                    value: _user.receiveUpdates,
+                    onChanged: (value) {
+                      setState(() {
+                        _user = _user.copyWith(receiveUpdates: value);
+                      });
+                    },
+                  ),
                 ),
                 const Divider(),
                 Padding(
@@ -154,28 +182,34 @@ class _PreferencesPageState extends State<PreferencesPage> {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
-                ..._availableInterests.map((interest) => CheckboxListTile(
-                  title: Text(interest),
-                  value: _user.interests.contains(interest),
-                  onChanged: (bool? value) {
-                    setState(() {
-                      if (value == true) {
-                        _user = _user.copyWith(
-                          interests: [..._user.interests, interest],
-                        );
-                      } else {
-                        _user = _user.copyWith(
-                          interests: _user.interests.where((i) => i != interest).toList(),
-                        );
-                      }
-                    });
-                  },
+                ..._availableInterests.map((interest) => Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: CheckboxListTile(
+                    title: Text(interest),
+                    value: _user.interests.contains(interest),
+                    onChanged: (bool? value) {
+                      setState(() {
+                        if (value == true) {
+                          _user = _user.copyWith(
+                            interests: [..._user.interests, interest],
+                          );
+                        } else {
+                          _user = _user.copyWith(
+                            interests: _user.interests.where((i) => i != interest).toList(),
+                          );
+                        }
+                      });
+                    },
+                  ),
                 )),
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: ElevatedButton(
                     onPressed: _savePreferences,
                     child: const Text('Save Preferences'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
                   ),
                 ),
               ],

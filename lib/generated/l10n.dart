@@ -350,6 +350,16 @@ class S {
     );
   }
 
+  /// `Change Theme`
+  String get changeTheme {
+    return Intl.message(
+      'Change Theme',
+      name: 'changeTheme',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Sent: {format}`
   String sent(Object format) {
     return Intl.message(
