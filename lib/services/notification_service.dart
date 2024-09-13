@@ -43,7 +43,7 @@ class NotificationService {
       );
 
       const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-      final DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
+      final DarwinInitializationSettings initializationSettingsIOS = const DarwinInitializationSettings(
         requestAlertPermission: true,
         requestBadgePermission: true,
         requestSoundPermission: true,
@@ -384,7 +384,7 @@ class NotificationService {
       print('Notification with ID $notificationId deleted successfully.');
     } catch (e) {
       print('Error deleting notification: $e');
-      throw e; // Rethrow the error so it can be caught in the UI
+      rethrow; // Rethrow the error so it can be caught in the UI
     }
   }
 }

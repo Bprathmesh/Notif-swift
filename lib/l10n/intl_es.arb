@@ -1,0 +1,51 @@
+{
+  "@@locale": "es",
+  "homePage": "Página de Inicio",
+  "receiveNotifications": "Recibir Notificaciones",
+  "viewNotificationHistory": "Ver Historial de Notificaciones",
+  "sendTestNotifications": "Enviar Notificaciones de Prueba",
+  "sendPersonalizedNotification": "Enviar Notificación Personalizada",
+  "sendPromotionalNotification": "Enviar Notificación Promocional",
+  "sendUpdateNotification": "Enviar Notificación de Actualización",
+  "scheduleNotification": "Programar Notificación",
+  "errorInitializingNotifications": "Error al iniciar las notificaciones. Por favor, inténtelo de nuevo más tarde.",
+  "errorUpdatingNotificationSettings": "Error al actualizar la configuración de notificaciones. Por favor, inténtelo de nuevo.",
+  "errorSigningOut": "Error al cerrar sesión. Por favor, inténtelo de nuevo.",
+  "personalizedNotificationTitle": "Notificación Personalizada",
+  "personalizedNotificationBody": "Esta es una notificación personalizada de prueba",
+  "personalizedNotificationSent": "Notificación personalizada enviada",
+  "userNotLoggedIn": "Usuario no ha iniciado sesión. No se puede enviar la notificación.",
+  "errorSendingPersonalizedNotification": "Error al enviar la notificación personalizada. Por favor, inténtelo de nuevo.",
+  "promotionalNotificationSent": "Notificación promocional enviada",
+  "errorSendingPromotionalNotification": "Error al enviar la notificación promocional. Por favor, inténtelo de nuevo.",
+  "updateNotificationSent": "Notificación de actualización enviada",
+  "errorSendingUpdateNotification": "Error al enviar la notificación de actualización. Por favor, inténtelo de nuevo.",
+  "notificationScheduled": "Notificación programada para 1 minuto desde ahora",
+  "errorSchedulingNotification": "Error al programar la notificación. Por favor, inténtelo de nuevo.",
+  "changeLanguage": "Cambiar Idioma",
+  "failedToDeleteNotification": "Error al eliminar la notificación",
+  "notificationDeleted": "Notificación eliminada",
+  "noDate": "Sin fecha",
+  "noTitle": "Sin título",
+  "noBody": "Sin cuerpo",
+  "noNotifications": "Sin notificaciones",
+  "notificationHistoryPage": "Historial de Notificaciones",
+  "sent": "Enviado: {format}",
+  "@sent": {
+    "placeholders": {
+      "format": {}
+    }
+  },
+  "scheduledFor": "Programado para: {format}",
+  "@scheduledFor": {
+    "placeholders": {
+      "format": {}
+    }
+  },
+  "error": "Error: {string}",
+  "@error": {
+    "placeholders": {
+      "string": {}
+    }
+  }
+}

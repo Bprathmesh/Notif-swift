@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mypushnotifications/services/notification_service.dart';
 import 'package:intl/intl.dart';
+import 'package:mypushnotifications/generated/l10n.dart';
 
 class NotificationHistoryPage extends StatefulWidget {
   @override
@@ -38,7 +39,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notification History'),
+        title: Text(S.of(context).notificationHistoryPage),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _notificationsStream,
@@ -48,11 +49,11 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text(S.of(context).error(snapshot.error.toString())));
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('No notifications'));
+            return Center(child: Text(S.of(context).noNotifications));
           }
 
           return ListView.builder(
@@ -72,11 +73,11 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
                   _deleteNotification(notification.id);
                 },
                 child: ListTile(
-                  title: Text(notification['title'] ?? 'No title'),
+                  title: Text(notification['title'] ?? S.of(context).noTitle),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(notification['body'] ?? 'No body'),
+                      Text(notification['body'] ?? S.of(context).noBody),
                       Text(
                         _getFormattedDate(notification),
                         style: TextStyle(fontSize: 12, color: Colors.grey),
@@ -97,30 +98,53 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
   }
 
   String _getFormattedDate(DocumentSnapshot notification) {
-    if (notification['status'] == 'scheduled' && notification['scheduledTime'] != null) {
-      return 'Scheduled for: ${DateFormat('yyyy-MM-dd HH:mm').format(notification['scheduledTime'].toDate())}';
-    } else if (notification['timestamp'] != null) {
-      return 'Sent: ${DateFormat('yyyy-MM-dd HH:mm').format(notification['timestamp'].toDate())}';
+    try {
+      if (notification.data() is Map<String, dynamic>) {
+        final data = notification.data() as Map<String, dynamic>;
+        if (data['status'] == 'scheduled' && data['scheduledTime'] != null) {
+          return S.of(context).scheduledFor(DateFormat('yyyy-MM-dd HH:mm').format(data['scheduledTime'].toDate()));
+        } else if (data['timestamp'] != null) {
+          return S.of(context).sent(DateFormat('yyyy-MM-dd HH:mm').format(data['timestamp'].toDate()));
+        }
+      }
+    } catch (e) {
+      print('Error formatting date: $e');
     }
-    return 'No date';
+    return S.of(context).noDate;
   }
 
   IconData _getNotificationIcon(DocumentSnapshot notification) {
-    return notification['status'] == 'scheduled' ? Icons.schedule : Icons.notifications;
+    try {
+      if (notification.data() is Map<String, dynamic>) {
+        final data = notification.data() as Map<String, dynamic>;
+        return data['status'] == 'scheduled' ? Icons.schedule : Icons.notifications;
+      }
+    } catch (e) {
+      print('Error getting notification icon: $e');
+    }
+    return Icons.notifications;
   }
 
   Color _getNotificationColor(DocumentSnapshot notification) {
-    return notification['status'] == 'scheduled' ? Colors.orange : Colors.blue;
+    try {
+      if (notification.data() is Map<String, dynamic>) {
+        final data = notification.data() as Map<String, dynamic>;
+        return data['status'] == 'scheduled' ? Colors.orange : Colors.blue;
+      }
+    } catch (e) {
+      print('Error getting notification color: $e');
+    }
+    return Colors.blue;
   }
 
   void _deleteNotification(String notificationId) {
     _notificationService.deleteNotification(notificationId).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Notification deleted')),
+        SnackBar(content: Text(S.of(context).notificationDeleted)),
       );
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete notification')),
+        SnackBar(content: Text(S.of(context).failedToDeleteNotification)),
       );
     });
   }

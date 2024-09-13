@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously, library_prefixes
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +9,8 @@ import 'package:mypushnotifications/services/auth_service.dart';
 import 'package:mypushnotifications/services/firebase_service.dart';
 
 class PreferencesPage extends StatefulWidget {
+  const PreferencesPage({super.key});
+
   @override
   _PreferencesPageState createState() => _PreferencesPageState();
 }
@@ -21,7 +25,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
   late AppUser.User _user;
   bool _isLoading = true;
 
-  List<String> _availableInterests = [
+  final List<String> _availableInterests = [
     'Technology', 'Sports', 'Music', 'Travel', 'Food', 'Fashion', 'Health', 'Finance'
   ];
 
@@ -79,7 +83,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
       await _firebaseService.saveUserPreferences(_user.id, _user.receivePromotions);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Preferences saved successfully')),
+        const SnackBar(content: Text('Preferences saved successfully')),
       );
 
       // If notifications are enabled, send a test notification
@@ -105,18 +109,18 @@ class _PreferencesPageState extends State<PreferencesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Preferences'),
+        title: const Text('Preferences'),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : ListView(
               children: [
                 ListTile(
-                  title: Text('Email'),
+                  title: const Text('Email'),
                   subtitle: Text(_user.email),
                 ),
                 SwitchListTile(
-                  title: Text('Receive Notifications'),
+                  title: const Text('Receive Notifications'),
                   value: _user.receiveNotifications,
                   onChanged: (value) {
                     setState(() {
@@ -125,7 +129,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
                   },
                 ),
                 SwitchListTile(
-                  title: Text('Receive Promotions'),
+                  title: const Text('Receive Promotions'),
                   value: _user.receivePromotions,
                   onChanged: (value) {
                     setState(() {
@@ -134,7 +138,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
                   },
                 ),
                 SwitchListTile(
-                  title: Text('Receive Updates'),
+                  title: const Text('Receive Updates'),
                   value: _user.receiveUpdates,
                   onChanged: (value) {
                     setState(() {
@@ -142,9 +146,9 @@ class _PreferencesPageState extends State<PreferencesPage> {
                     });
                   },
                 ),
-                Divider(),
+                const Divider(),
                 Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Text(
                     'Interests',
                     style: Theme.of(context).textTheme.titleLarge,
@@ -166,12 +170,12 @@ class _PreferencesPageState extends State<PreferencesPage> {
                       }
                     });
                   },
-                )).toList(),
+                )),
                 Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: ElevatedButton(
-                    child: Text('Save Preferences'),
                     onPressed: _savePreferences,
+                    child: const Text('Save Preferences'),
                   ),
                 ),
               ],

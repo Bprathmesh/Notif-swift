@@ -65,16 +65,16 @@ class User {
     DateTime? lastLogin,
   }) {
     return User(
-      id: this.id,
+      id: id,
       name: name ?? this.name,
-      email: this.email,
+      email: email,
       receivePromotions: receivePromotions ?? this.receivePromotions,
       receiveUpdates: receiveUpdates ?? this.receiveUpdates,
       receiveNotifications: receiveNotifications ?? this.receiveNotifications,
       fcmToken: fcmToken ?? this.fcmToken,
       interests: interests ?? this.interests,
       lastLogin: lastLogin ?? this.lastLogin,
-      createdAt: this.createdAt,
+      createdAt: createdAt,
     );
   }
 }

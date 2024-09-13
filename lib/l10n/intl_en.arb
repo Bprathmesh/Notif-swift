@@ -1,0 +1,51 @@
+{
+  "@@locale": "en",
+  "homePage": "Home Page",
+  "receiveNotifications": "Receive Notifications",
+  "viewNotificationHistory": "View Notification History",
+  "sendTestNotifications": "Send Test Notifications",
+  "sendPersonalizedNotification": "Send Personalized Notification",
+  "sendPromotionalNotification": "Send Promotional Notification",
+  "sendUpdateNotification": "Send Update Notification",
+  "scheduleNotification": "Schedule Notification",
+  "errorInitializingNotifications": "Error initializing notifications. Please try again later.",
+  "errorUpdatingNotificationSettings": "Error updating notification settings. Please try again.",
+  "errorSigningOut": "Error signing out. Please try again.",
+  "personalizedNotificationTitle": "Personalized Notification",
+  "personalizedNotificationBody": "This is a test personalized notification",
+  "personalizedNotificationSent": "Personalized notification sent",
+  "userNotLoggedIn": "User not logged in. Cannot send notification.",
+  "errorSendingPersonalizedNotification": "Error sending personalized notification. Please try again.",
+  "promotionalNotificationSent": "Promotional notification sent",
+  "errorSendingPromotionalNotification": "Error sending promotional notification. Please try again.",
+  "updateNotificationSent": "Update notification sent",
+  "errorSendingUpdateNotification": "Error sending update notification. Please try again.",
+  "notificationScheduled": "Notification scheduled for 1 minute from now",
+  "errorSchedulingNotification": "Error scheduling notification. Please try again.",
+  "changeLanguage": "Change Language",
+  "failedToDeleteNotification": "Failed to delete notification",
+  "notificationDeleted": "Notification deleted",
+  "noDate": "No date",
+  "noTitle": "No title",
+  "noBody": "No body",
+  "noNotifications": "No notifications",
+  "notificationHistoryPage": "Notification History",
+  "sent": "Sent: {format}",
+  "@sent": {
+    "placeholders": {
+      "format": {}
+    }
+  },
+  "scheduledFor": "Scheduled for: {format}",
+  "@scheduledFor": {
+    "placeholders": {
+      "format": {}
+    }
+  },
+  "error": "Error: {string}",
+  "@error": {
+    "placeholders": {
+      "string": {}
+    }
+  }
+}

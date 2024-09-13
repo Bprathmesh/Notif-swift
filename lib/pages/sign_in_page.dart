@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mypushnotifications/services/auth_service.dart';
 
 class SignInPage extends StatefulWidget {
+  const SignInPage({super.key});
+
   @override
   _SignInPageState createState() => _SignInPageState();
 }
@@ -44,23 +46,23 @@ class _SignInPageState extends State<SignInPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign In'),
+        title: const Text('Sign In'),
         elevation: 0,
         backgroundColor:const Color.fromARGB(255, 177, 68, 255),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               'Welcome Back!',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Email',
                 prefixIcon: Icon(Icons.email),
                 border: OutlineInputBorder(),
@@ -70,45 +72,45 @@ class _SignInPageState extends State<SignInPage> {
               ),
               keyboardType: TextInputType.emailAddress,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Password',
                 prefixIcon: Icon(Icons.lock),
                 border: OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: const Color(0xD2FF4444), width: 2.0),
+                  borderSide: BorderSide(color: Color(0xD2FF4444), width: 2.0),
                 ),
               ),
               obscureText: true,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _loading
-                ? CircularProgressIndicator()
+                ? const CircularProgressIndicator()
                 : ElevatedButton(
                     onPressed: _signIn,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 177, 68, 255),
-                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Sign In',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/register');
               },
-              child: Text('Create an account'),
               style: TextButton.styleFrom(
                 foregroundColor: const Color.fromARGB(255, 177, 68, 255),
               ),
+              child: Text('Create an account'),
             ),
           ],
         ),
