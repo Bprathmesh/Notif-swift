@@ -23,6 +23,7 @@
   "notificationScheduled": "Notificación programada para 1 minuto desde ahora",
   "errorSchedulingNotification": "Error al programar la notificación. Por favor, inténtelo de nuevo.",
   "changeLanguage": "Cambiar Idioma",
+  "changeTheme": "Cambiar Tema",
   "failedToDeleteNotification": "Error al eliminar la notificación",
   "notificationDeleted": "Notificación eliminada",
   "noDate": "Sin fecha",
@@ -30,7 +31,6 @@
   "noBody": "Sin cuerpo",
   "noNotifications": "Sin notificaciones",
   "notificationHistoryPage": "Historial de Notificaciones",
-  "changeTheme": "Cambiar Tema",
   "sent": "Enviado: {format}",
   "@sent": {
     "placeholders": {
@@ -48,5 +48,81 @@
     "placeholders": {
       "string": {}
     }
-  }
+  },
+  "technology": "Tecnología",
+  "sports": "Deportes",
+  "music": "Música",
+  "travel": "Viajes",
+  "food": "Comida",
+  "fashion": "Moda",
+  "health": "Salud",
+  "finance": "Finanzas",
+
+  "technologyMessage1": "¡Nuevo gadget tecnológico lanzado!",
+  "technologyMessage2": "¡Noticias de última hora en el desarrollo de IA!",
+  "technologyMessage3": "Descubre lo último en tecnología para el hogar inteligente.",
+
+  "sportsMessage1": "¡Alerta de gran partido! No te pierdas la acción.",
+  "sportsMessage2": "¡Tu equipo favorito tiene un próximo partido!",
+  "sportsMessage3": "Nuevo equipo deportivo disponible.",
+
+  "musicMessage1": "¡Tu artista favorito acaba de lanzar un nuevo álbum!",
+  "musicMessage2": "Las entradas para un próximo concierto ya están a la venta.",
+  "musicMessage3": "Descubre las listas de éxitos de esta semana.",
+
+  "travelMessage1": "¿Soñando con una escapada? ¡Mira nuestras últimas ofertas de viaje!",
+  "travelMessage2": "Explora nuevos destinos con nuestra guía de viaje.",
+  "travelMessage3": "¡Paquetes de vacaciones de última hora disponibles!",
+
+  "foodMessage1": "¿Hambre? Descubre nuevas recetas de tu cocina favorita.",
+  "foodMessage2": "¡Restaurantes mejor valorados en tu zona con ofertas especiales!",
+  "foodMessage3": "Nuevo tutorial de cocina: Aprende a hacer platos gourmet en casa.",
+
+  "defaultMessage": "¡Tenemos noticias emocionantes para ti!",
+  "language": "Idioma",
+  "english": "Inglés",
+  "spanish": "Español",
+  "signIn": "Iniciar Sesión",
+  "register": "Registrarse",
+  "email": "Correo Electrónico",
+  "password": "Contraseña",
+  "name": "Nombre",
+  "pleaseEnterName": "Por favor, ingrese su nombre",
+  "pleaseEnterEmail": "Por favor, ingrese un correo electrónico",
+  "passwordMustBe6Chars": "La contraseña debe tener al menos 6 caracteres",
+  "receivePromotions": "Recibir Promociones",
+  "receiveUpdates": "Recibir Actualizaciones",
+  "registrationFailed": "Registro fallido: {error}",
+  "@registrationFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "welcomeBack": "¡Bienvenido de nuevo!",
+  "createAccount": "Crear una cuenta",
+  "preferences": "Preferencias",
+  "preferencesSaved": "Preferencias guardadas exitosamente",
+  "preferencesUpdated": "Preferencias Actualizadas",
+  "notificationPreferencesUpdated": "Sus preferencias de notificación han sido actualizadas.",
+  "failedToSavePreferences": "Error al guardar las preferencias: {error}",
+  "@failedToSavePreferences": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "interests": "Intereses",
+  "interest": "{interest}",
+  "@interest": {
+    "placeholders": {
+      "interest": {}
+    }
+  },
+  "savePreferences": "Guardar Preferencias",
+  "hello": "Hola {name}",
+  "promotionalNotificationTitle": "¡Oferta Especial!",
+  "promotionalNotificationBody": "{name}, ¡descubre nuestra última promoción!",
+  "user": "Usuario",
+  "updateNotificationTitle": "Actualización de la App",
+  "updateNotificationBody": "Tenemos nuevas funciones emocionantes para ti. ¡Actualiza ahora para explorarlas!",
+  "scheduledNotificationTitle": "Notificación Programada"
 }

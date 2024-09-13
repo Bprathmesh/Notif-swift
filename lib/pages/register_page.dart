@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:provider/provider.dart';
+import 'package:mypushnotifications/providers/language_provider.dart';
+import 'package:mypushnotifications/generated/l10n.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -18,6 +21,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isLoading = false;
   bool _receivePromotions = false;
   bool _receiveUpdates = false;
+  String _selectedLanguage = 'en';
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
@@ -40,12 +44,16 @@ class _RegisterPageState extends State<RegisterPage> {
           'receivePromotions': _receivePromotions,
           'receiveUpdates': _receiveUpdates,
           'createdAt': FieldValue.serverTimestamp(),
+          'preferredLanguage': _selectedLanguage,
         });
+
+        // Set the user's preferred language
+        Provider.of<LanguageProvider>(context, listen: false).setLocale(Locale(_selectedLanguage));
 
         Navigator.pushReplacementNamed(context, '/home');
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration failed: $e')),
+          SnackBar(content: Text(S.of(context).registrationFailed(e.toString()))),
         );
       } finally {
         setState(() {
@@ -58,7 +66,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Register')),
+      appBar: AppBar(title: Text(S.of(context).register)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -68,22 +76,22 @@ class _RegisterPageState extends State<RegisterPage> {
             children: <Widget>[
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
-                validator: (value) => value!.isEmpty ? 'Please enter your name' : null,
+                decoration: InputDecoration(labelText: S.of(context).name),
+                validator: (value) => value!.isEmpty ? S.of(context).pleaseEnterName : null,
               ),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: (value) => value!.isEmpty ? 'Please enter an email' : null,
+                decoration: InputDecoration(labelText: S.of(context).email),
+                validator: (value) => value!.isEmpty ? S.of(context).pleaseEnterEmail : null,
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
+                decoration: InputDecoration(labelText: S.of(context).password),
                 obscureText: true,
-                validator: (value) => value!.length < 6 ? 'Password must be at least 6 characters' : null,
+                validator: (value) => value!.length < 6 ? S.of(context).passwordMustBe6Chars : null,
               ),
               SwitchListTile(
-                title: const Text('Receive Promotions'),
+                title: Text(S.of(context).receivePromotions),
                 value: _receivePromotions,
                 onChanged: (bool value) {
                   setState(() {
@@ -92,11 +100,23 @@ class _RegisterPageState extends State<RegisterPage> {
                 },
               ),
               SwitchListTile(
-                title: const Text('Receive Updates'),
+                title: Text(S.of(context).receiveUpdates),
                 value: _receiveUpdates,
                 onChanged: (bool value) {
                   setState(() {
                     _receiveUpdates = value;
+                  });
+                },
+              ),
+              DropdownButton<String>(
+                value: _selectedLanguage,
+                items: [
+                  DropdownMenuItem(value: 'en', child: Text(S.of(context).english)),
+                  DropdownMenuItem(value: 'es', child: Text(S.of(context).spanish)),
+                ],
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedLanguage = newValue!;
                   });
                 },
               ),
@@ -105,7 +125,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: _register,
-                      child: const Text('Register'),
+                      child: Text(S.of(context).register),
                     ),
             ],
           ),

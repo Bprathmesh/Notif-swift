@@ -23,6 +23,7 @@
   "notificationScheduled": "Notification scheduled for 1 minute from now",
   "errorSchedulingNotification": "Error scheduling notification. Please try again.",
   "changeLanguage": "Change Language",
+  "changeTheme": "Change Theme",
   "failedToDeleteNotification": "Failed to delete notification",
   "notificationDeleted": "Notification deleted",
   "noDate": "No date",
@@ -30,7 +31,6 @@
   "noBody": "No body",
   "noNotifications": "No notifications",
   "notificationHistoryPage": "Notification History",
-  "changeTheme": "Change Theme",
   "sent": "Sent: {format}",
   "@sent": {
     "placeholders": {
@@ -48,5 +48,82 @@
     "placeholders": {
       "string": {}
     }
-  }
+  },
+  "technology": "Technology",
+  "sports": "Sports",
+  "music": "Music",
+  "travel": "Travel",
+  "food": "Food",
+  "fashion": "Fashion",
+  "health": "Health",
+  "finance": "Finance",
+
+  "technologyMessage1": "New tech gadget launched!",
+  "technologyMessage2": "Breaking news on AI development!",
+  "technologyMessage3": "Discover the latest in smart home technology.",
+
+  "sportsMessage1": "Big match alert! Don’t miss the action.",
+  "sportsMessage2": "Your favorite team has an upcoming match!",
+  "sportsMessage3": "New sports gear available.",
+
+  "musicMessage1": "Your favorite artist just released a new album!",
+  "musicMessage2": "Tickets for an upcoming concert are now on sale.",
+  "musicMessage3": "Discover this week’s top hits.",
+
+  "travelMessage1": "Dreaming of a getaway? Check out our latest travel deals!",
+  "travelMessage2": "Explore new destinations with our travel guide.",
+  "travelMessage3": "Last-minute vacation packages available!",
+
+  "foodMessage1": "Hungry? Discover new recipes from your favorite cuisine.",
+  "foodMessage2": "Top-rated restaurants near you with special offers!",
+  "foodMessage3": "New cooking tutorial: Learn to make gourmet dishes at home.",
+
+  "defaultMessage": "We have exciting news for you!",
+  
+  "language": "Language",
+  "english": "English",
+  "spanish": "Spanish",
+  "signIn": "Sign In",
+  "register": "Register",
+  "email": "Email",
+  "password": "Password",
+  "name": "Name",
+  "pleaseEnterName": "Please enter your name",
+  "pleaseEnterEmail": "Please enter an email",
+  "passwordMustBe6Chars": "Password must be at least 6 characters",
+  "receivePromotions": "Receive Promotions",
+  "receiveUpdates": "Receive Updates",
+  "registrationFailed": "Registration failed: {error}",
+  "@registrationFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "welcomeBack": "Welcome Back!",
+  "createAccount": "Create an account",
+  "preferences": "Preferences",
+  "preferencesSaved": "Preferences saved successfully",
+  "preferencesUpdated": "Preferences Updated",
+  "notificationPreferencesUpdated": "Your notification preferences have been updated.",
+  "failedToSavePreferences": "Failed to save preferences: {error}",
+  "@failedToSavePreferences": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "interests": "Interests",
+  "interest": "{interest}",
+  "@interest": {
+    "placeholders": {
+      "interest": {}
+    }
+  },
+  "savePreferences": "Save Preferences",
+  "hello": "Hello {name}",
+  "promotionalNotificationTitle": "Special Offer!",
+  "promotionalNotificationBody": "{name}, check out our latest promotion!",
+  "user": "User",
+  "updateNotificationTitle": "App Update",
+  "updateNotificationBody": "We have some exciting new features for you. Update now to explore!",
+  "scheduledNotificationTitle": "Scheduled Notification"
 }

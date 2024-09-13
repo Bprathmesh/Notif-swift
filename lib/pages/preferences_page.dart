@@ -1,5 +1,3 @@
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously, library_prefixes
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +7,8 @@ import 'package:mypushnotifications/services/auth_service.dart';
 import 'package:mypushnotifications/services/firebase_service.dart';
 import 'package:provider/provider.dart';
 import 'package:mypushnotifications/providers/theme_provider.dart';
+import 'package:mypushnotifications/providers/language_provider.dart';
+import 'package:mypushnotifications/generated/l10n.dart';
 
 class PreferencesPage extends StatefulWidget {
   const PreferencesPage({super.key});
@@ -26,10 +26,6 @@ class _PreferencesPageState extends State<PreferencesPage> {
   
   late AppUser.User _user;
   bool _isLoading = true;
-
-  final List<String> _availableInterests = [
-    'Technology', 'Sports', 'Music', 'Travel', 'Food', 'Fashion', 'Health', 'Finance'
-  ];
 
   @override
   void initState() {
@@ -60,6 +56,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
         interests: [],
         lastLogin: DateTime.now(),
         createdAt: DateTime.now(),
+        preferredLanguage: 'en',
       );
       // Create the user document in Firestore
       await _firestore.collection('users').doc(userId).set(_user.toMap());
@@ -85,20 +82,21 @@ class _PreferencesPageState extends State<PreferencesPage> {
       await _firebaseService.saveUserPreferences(_user.id, _user.receivePromotions);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preferences saved successfully')),
+        SnackBar(content: Text(S.of(context).preferencesSaved)),
       );
 
       // If notifications are enabled, send a test notification
       if (_user.receiveNotifications) {
         await _notificationService.sendPersonalizedNotification(
           userId: _user.id,
-          title: 'Preferences Updated',
-          body: 'Your notification preferences have been updated.',
+          title: S.of(context).preferencesUpdated,
+          body: S.of(context).notificationPreferencesUpdated,
+          context: context,
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save preferences: $e')),
+        SnackBar(content: Text(S.of(context).failedToSavePreferences(e.toString()))),
       );
     }
 
@@ -112,18 +110,46 @@ class _PreferencesPageState extends State<PreferencesPage> {
     themeProvider.toggleTheme();
   }
 
+  List<String> _getAvailableInterests(BuildContext context) {
+    return [
+      S.of(context).technology,
+      S.of(context).sports,
+      S.of(context).music,
+      S.of(context).travel,
+      S.of(context).food,
+      S.of(context).fashion,
+      S.of(context).health,
+      S.of(context).finance,
+    ];
+  }
+  String _getLocalizedInterest(BuildContext context, String interest) {
+    Map<String, String> interestMap = {
+      'Technology': S.of(context).technology,
+      'Sports': S.of(context).sports,
+      'Music': S.of(context).music,
+      'Travel': S.of(context).travel,
+      'Food': S.of(context).food,
+      'Fashion': S.of(context).fashion,
+      'Health': S.of(context).health,
+      'Finance': S.of(context).finance,
+    };
+    return interestMap[interest] ?? interest;
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final availableInterests = _getAvailableInterests(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Preferences'),
+        title: Text(S.of(context).preferences),
         actions: [
           IconButton(
             icon: Icon(themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode),
             onPressed: _toggleTheme,
-            tooltip: 'Change Theme',
+            tooltip: S.of(context).changeTheme,
           ),
         ],
       ),
@@ -134,14 +160,14 @@ class _PreferencesPageState extends State<PreferencesPage> {
                 Card(
                   margin: const EdgeInsets.all(8),
                   child: ListTile(
-                    title: const Text('Email'),
+                    title: Text(S.of(context).email),
                     subtitle: Text(_user.email),
                   ),
                 ),
                 Card(
                   margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: SwitchListTile(
-                    title: const Text('Receive Notifications'),
+                    title: Text(S.of(context).receiveNotifications),
                     value: _user.receiveNotifications,
                     onChanged: (value) {
                       setState(() {
@@ -153,7 +179,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
                 Card(
                   margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: SwitchListTile(
-                    title: const Text('Receive Promotions'),
+                    title: Text(S.of(context).receivePromotions),
                     value: _user.receivePromotions,
                     onChanged: (value) {
                       setState(() {
@@ -165,7 +191,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
                 Card(
                   margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: SwitchListTile(
-                    title: const Text('Receive Updates'),
+                    title: Text(S.of(context).receiveUpdates),
                     value: _user.receiveUpdates,
                     onChanged: (value) {
                       setState(() {
@@ -174,15 +200,36 @@ class _PreferencesPageState extends State<PreferencesPage> {
                     },
                   ),
                 ),
+                Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: ListTile(
+                    title: Text(S.of(context).language),
+                    trailing: DropdownButton<String>(
+                      value: _user.preferredLanguage,
+                      items: [
+                        DropdownMenuItem(value: 'en', child: Text(S.of(context).english)),
+                        DropdownMenuItem(value: 'es', child: Text(S.of(context).spanish)),
+                      ],
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            _user = _user.copyWith(preferredLanguage: newValue);
+                          });
+                          languageProvider.setLocale(Locale(newValue));
+                        }
+                      },
+                    ),
+                  ),
+                ),
                 const Divider(),
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    'Interests',
+                    S.of(context).interests,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
-                ..._availableInterests.map((interest) => Card(
+                ...availableInterests.map((interest) => Card(
                   margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: CheckboxListTile(
                     title: Text(interest),
@@ -206,7 +253,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
                   padding: const EdgeInsets.all(16),
                   child: ElevatedButton(
                     onPressed: _savePreferences,
-                    child: const Text('Save Preferences'),
+                    child: Text(S.of(context).savePreferences),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),

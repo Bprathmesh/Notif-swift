@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mypushnotifications/services/auth_service.dart';
+import 'package:provider/provider.dart';
+import 'package:mypushnotifications/providers/language_provider.dart';
+import 'package:mypushnotifications/generated/l10n.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -13,6 +16,7 @@ class _SignInPageState extends State<SignInPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _loading = false;
+  String _selectedLanguage = 'en';
 
   Future<void> _signIn() async {
     setState(() {
@@ -25,6 +29,9 @@ class _SignInPageState extends State<SignInPage> {
     try {
       final user = await _authService.signInWithEmailAndPassword(email, password);
       if (user != null) {
+        // Set the user's preferred language
+        Provider.of<LanguageProvider>(context, listen: false).setLocale(Locale(_selectedLanguage));
+        
         // Navigate to HomePage if sign-in is successful
         Navigator.pushReplacementNamed(context, '/home');
       }
@@ -46,27 +53,27 @@ class _SignInPageState extends State<SignInPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sign In'),
+        title: Text(S.of(context).signIn),
         elevation: 0,
-        backgroundColor:const Color.fromARGB(255, 177, 68, 255),
+        backgroundColor: const Color.fromARGB(255, 177, 68, 255),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Welcome Back!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Text(
+              S.of(context).welcomeBack,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                prefixIcon: Icon(Icons.email),
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
+              decoration: InputDecoration(
+                labelText: S.of(context).email,
+                prefixIcon: const Icon(Icons.email),
+                border: const OutlineInputBorder(),
+                focusedBorder: const OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
                 ),
               ),
@@ -75,15 +82,28 @@ class _SignInPageState extends State<SignInPage> {
             const SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                prefixIcon: Icon(Icons.lock),
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
+              decoration: InputDecoration(
+                labelText: S.of(context).password,
+                prefixIcon: const Icon(Icons.lock),
+                border: const OutlineInputBorder(),
+                focusedBorder: const OutlineInputBorder(
                   borderSide: BorderSide(color: Color(0xD2FF4444), width: 2.0),
                 ),
               ),
               obscureText: true,
+            ),
+            const SizedBox(height: 20),
+            DropdownButton<String>(
+              value: _selectedLanguage,
+              items: [
+                DropdownMenuItem(value: 'en', child: Text(S.of(context).english)),
+                DropdownMenuItem(value: 'es', child: Text(S.of(context).spanish)),
+              ],
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedLanguage = newValue!;
+                });
+              },
             ),
             const SizedBox(height: 20),
             _loading
@@ -97,9 +117,9 @@ class _SignInPageState extends State<SignInPage> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: const Text(
-                      'Sign In',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    child: Text(
+                      S.of(context).signIn,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
             const SizedBox(height: 16),
@@ -110,7 +130,7 @@ class _SignInPageState extends State<SignInPage> {
               style: TextButton.styleFrom(
                 foregroundColor: const Color.fromARGB(255, 177, 68, 255),
               ),
-              child: const Text('Create an account'),
+              child: Text(S.of(context).createAccount),
             ),
           ],
         ),

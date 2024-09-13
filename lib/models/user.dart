@@ -11,6 +11,7 @@ class User {
   final List<String> interests;
   final DateTime lastLogin;
   final DateTime createdAt;
+  final String preferredLanguage; // New field
 
   User({
     required this.id,
@@ -23,6 +24,7 @@ class User {
     required this.interests,
     required this.lastLogin,
     required this.createdAt,
+    required this.preferredLanguage, // New field
   });
 
   factory User.fromMap(Map<String, dynamic> map) {
@@ -37,6 +39,7 @@ class User {
       interests: List<String>.from(map['interests'] ?? []),
       lastLogin: (map['lastLogin'] as Timestamp?)?.toDate() ?? DateTime.now(),
       createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      preferredLanguage: map['preferredLanguage'] as String? ?? 'en', // New field
     );
   }
 
@@ -52,6 +55,7 @@ class User {
       'interests': interests,
       'lastLogin': Timestamp.fromDate(lastLogin),
       'createdAt': Timestamp.fromDate(createdAt),
+      'preferredLanguage': preferredLanguage, // New field
     };
   }
 
@@ -63,6 +67,7 @@ class User {
     String? fcmToken,
     List<String>? interests,
     DateTime? lastLogin,
+    String? preferredLanguage, // New field
   }) {
     return User(
       id: id,
@@ -75,6 +80,7 @@ class User {
       interests: interests ?? this.interests,
       lastLogin: lastLogin ?? this.lastLogin,
       createdAt: createdAt,
+      preferredLanguage: preferredLanguage ?? this.preferredLanguage, // New field
     );
   }
 }

@@ -12,15 +12,22 @@ import 'services/notification_service.dart';
 import 'phoenix.dart';
 import 'package:provider/provider.dart';
 import 'package:mypushnotifications/providers/theme_provider.dart';
+import 'package:mypushnotifications/providers/language_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await NotificationService().init();
+
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
-      child: const Phoenix(child: MyApp()),
+    Phoenix(
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => ThemeProvider()),
+          ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 }
@@ -30,8 +37,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
+    return Consumer2<ThemeProvider, LanguageProvider>(
+      builder: (context, themeProvider, languageProvider, child) {
         return MaterialApp(
           title: 'Notification App',
           theme: themeProvider.lightTheme,
@@ -44,14 +51,14 @@ class MyApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: S.delegate.supportedLocales,
-          locale: const Locale('en'),
+          locale: languageProvider.currentLocale,
           initialRoute: '/',
           routes: {
             '/': (context) => const Wrapper(),
             '/home': (context) => const HomePage(),
             '/sign_in': (context) => const SignInPage(),
             '/register': (context) => const RegisterPage(),
-            '/notification_history': (context) => NotificationHistoryPage(),
+            '/notification_history': (context) => const NotificationHistoryPage(),
             '/preferences': (context) => const PreferencesPage(),
           },
         );

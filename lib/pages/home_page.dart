@@ -11,6 +11,7 @@ import 'package:mypushnotifications/generated/l10n.dart';
 import '../phoenix.dart';
 import 'package:provider/provider.dart';
 import 'package:mypushnotifications/providers/theme_provider.dart';
+import 'package:mypushnotifications/providers/language_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,8 +29,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   bool _receiveNotifications = false;
   late AnimationController _animationController;
   late Animation<double> _animation;
-  
-  Locale _currentLocale = const Locale('en');  // Default to English
 
   @override
   void initState() {
@@ -50,10 +49,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void _toggleLanguage() {
-    setState(() {
-      _currentLocale = (_currentLocale.languageCode == 'en') ? const Locale('es') : const Locale('en');
-      S.load(_currentLocale);
-    });
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    Locale newLocale = languageProvider.currentLocale.languageCode == 'en' ? const Locale('es') : const Locale('en');
+    languageProvider.setLocale(newLocale);
     Phoenix.rebirth(context);
   }
 
@@ -63,26 +61,26 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Future<void> _initializeNotifications() async {
-  try {
-    await _notificationService.init();
-    String? userId = _authService.getCurrentUser()?.uid;
-    if (userId != null) {
-      DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
-      if (userDoc.exists && mounted) {  // Add a check for mounted here
-        setState(() {
-          _receiveNotifications = userDoc.get('receiveNotifications') ?? false;
-        });
+    try {
+      await _notificationService.init();
+      String? userId = _authService.getCurrentUser()?.uid;
+      if (userId != null) {
+        DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+        if (userDoc.exists && mounted) {
+          setState(() {
+            _receiveNotifications = userDoc.get('receiveNotifications') ?? false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error initializing notifications: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context).errorInitializingNotifications)),
+        );
       }
     }
-  } catch (e) {
-    print('Error initializing notifications: $e');
-    if (mounted) {  // Add a check for mounted here as well
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context).errorInitializingNotifications)),
-      );
-    }
   }
-}
 
   Future<void> _toggleNotifications(bool value) async {
     setState(() {
@@ -126,6 +124,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           userId: userId,
           title: S.of(context).personalizedNotificationTitle,
           body: S.of(context).personalizedNotificationBody,
+          context: context,
         );
         _showSnackBar(S.of(context).personalizedNotificationSent);
       } else {
@@ -139,7 +138,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   Future<void> _sendPromotionalNotification() async {
     try {
-      await _notificationService.sendPromotionalNotification();
+      await _notificationService.sendPromotionalNotification(context);
       _showSnackBar(S.of(context).promotionalNotificationSent);
     } catch (e) {
       print('Error sending promotional notification: $e');
@@ -149,7 +148,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   Future<void> _sendUpdateNotification() async {
     try {
-      await _notificationService.sendUpdateNotification();
+      await _notificationService.sendUpdateNotification(context);
       _showSnackBar(S.of(context).updateNotificationSent);
     } catch (e) {
       print('Error sending update notification: $e');
@@ -163,7 +162,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       DateTime scheduledTime = DateTime.now().add(const Duration(minutes: 1));
       String? userId = _authService.getCurrentUser()?.uid;
       if (userId != null) {
-        await _notificationService.scheduleNotification(userId, scheduledTime);
+        await _notificationService.scheduleNotification(userId, scheduledTime, context);
         _showSnackBar(S.of(context).notificationScheduled);
       } else {
         _showSnackBar(S.of(context).userNotLoggedIn);
@@ -177,6 +176,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
     
     return Scaffold(
       appBar: AppBar(

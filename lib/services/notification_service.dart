@@ -6,6 +6,8 @@ import 'package:mypushnotifications/models/user.dart' as AppUser;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:mypushnotifications/generated/l10n.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -177,7 +179,12 @@ class NotificationService {
     }
   }
 
-  Future<void> sendPersonalizedNotification({required String userId, required String title, required String body}) async {
+  Future<void> sendPersonalizedNotification({
+    required String userId,
+    required String title,
+    required String body,
+    required BuildContext context,
+  }) async {
     try {
       await init();
       final user = _auth.currentUser;
@@ -197,8 +204,8 @@ class NotificationService {
         AppUser.User appUser = AppUser.User.fromMap(userDoc.data() as Map<String, dynamic>);
 
         if (appUser.receiveNotifications) {
-          String personalizedTitle = 'Hello ${appUser.name}!';
-          String personalizedBody = _getPersonalizedBody(appUser);
+          String personalizedTitle = S.of(context).hello(appUser.name);
+          String personalizedBody = _getPersonalizedBody(appUser, context);
 
           await _showLocalNotification(personalizedTitle, personalizedBody);
         } else {
@@ -211,47 +218,46 @@ class NotificationService {
       print('Error sending personalized notification: $e');
     }
   }
-
-  String _getPersonalizedBody(AppUser.User user) {
+  String _getPersonalizedBody(AppUser.User user, BuildContext context) {
     if (user.interests.isEmpty) {
-      return "Check out our latest updates!";
+      return S.of(context).defaultMessage;
     }
 
     String interest = user.interests[DateTime.now().microsecond % user.interests.length];
     
     Map<String, List<String>> interestMessages = {
-      'Technology': [
-        "New tech gadget just launched!",
-        "Breaking news in AI development!",
-        "Discover the latest in smart home technology.",
+      S.of(context).technology: [
+        S.of(context).technologyMessage1,
+        S.of(context).technologyMessage2,
+        S.of(context).technologyMessage3,
       ],
-      'Sports': [
-        "Big game alert! Don't miss the action.",
-        "Your favorite team has an upcoming match!",
-        "New sports gear now available.",
+      S.of(context).sports: [
+        S.of(context).sportsMessage1,
+        S.of(context).sportsMessage2,
+        S.of(context).sportsMessage3,
       ],
-      'Music': [
-        "Your favorite artist just dropped a new album!",
-        "Tickets for an upcoming concert are now on sale.",
-        "Discover this week's top charts.",
+      S.of(context).music: [
+        S.of(context).musicMessage1,
+        S.of(context).musicMessage2,
+        S.of(context).musicMessage3,
       ],
-      'Travel': [
-        "Dreaming of a getaway? Check out our latest travel deals!",
-        "Explore new destinations with our travel guide.",
-        "Last-minute vacation packages now available!",
+      S.of(context).travel: [
+        S.of(context).travelMessage1,
+        S.of(context).travelMessage2,
+        S.of(context).travelMessage3,
       ],
-      'Food': [
-        "Hungry? Discover new recipes for your favorite cuisine.",
-        "Top-rated restaurants in your area with special offers!",
-        "New cooking tutorial: Learn to make gourmet dishes at home.",
+      S.of(context).food: [
+        S.of(context).foodMessage1,
+        S.of(context).foodMessage2,
+        S.of(context).foodMessage3,
       ],
     };
 
-    List<String> messages = interestMessages[interest] ?? ["We have some exciting news for you!"];
+    List<String> messages = interestMessages[interest] ?? [S.of(context).defaultMessage];
     return messages[DateTime.now().second % messages.length];
   }
 
-  Future<void> sendPromotionalNotification() async {
+  Future<void> sendPromotionalNotification(BuildContext context) async {
     try {
       await init();
       final user = _auth.currentUser;
@@ -262,8 +268,8 @@ class NotificationService {
           Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
 
           if (userData['receivePromotions'] == true && userData['receiveNotifications'] == true) {
-            String title = 'Special Offer!';
-            String body = '${userData['name'] ?? 'User'}, check out our latest promotion!';
+            String title = S.of(context).promotionalNotificationTitle;
+            String body = S.of(context).promotionalNotificationBody(userData['name'] ?? S.of(context).user);
 
             await _showLocalNotification(title, body);
           } else {
@@ -278,7 +284,7 @@ class NotificationService {
     }
   }
 
-  Future<void> sendUpdateNotification() async {
+  Future<void> sendUpdateNotification(BuildContext context) async {
     try {
       await init();
       final user = _auth.currentUser;
@@ -289,8 +295,8 @@ class NotificationService {
           Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
 
           if (userData['receiveUpdates'] == true) {
-            String title = 'App Update';
-            String body = 'We have some exciting new features for you. Update now to explore!';
+            String title = S.of(context).updateNotificationTitle;
+            String body = S.of(context).updateNotificationBody;
 
             await _showLocalNotification(title, body);
           } else {
@@ -305,59 +311,60 @@ class NotificationService {
     }
   }
 
-  Future<void> scheduleNotification(String userId, DateTime scheduledTime) async {
-  try {
-    await init();
-    final user = await _firestore.collection('users').doc(userId).get();
-    if (user.exists) {
-      AppUser.User appUser = AppUser.User.fromMap(user.data() as Map<String, dynamic>);
-      
-      String title = 'Scheduled Notification';
-      String body = _getPersonalizedBody(appUser);
+  Future<void> scheduleNotification(String userId, DateTime scheduledTime, BuildContext context) async {
+    try {
+      await init();
+      final user = await _firestore.collection('users').doc(userId).get();
+      if (user.exists) {
+        AppUser.User appUser = AppUser.User.fromMap(user.data() as Map<String, dynamic>);
+        
+        String title = S.of(context).scheduledNotificationTitle;
+        String body = _getPersonalizedBody(appUser, context);
 
-      // Schedule the notification
-      await _flutterLocalNotificationsPlugin.zonedSchedule(
-        0,
-        title,
-        body,
-        tz.TZDateTime.from(scheduledTime, tz.local),
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            _personalizedChannelId,
-            _personalizedChannelName,
-            importance: Importance.max,
-            priority: Priority.high,
+        // Schedule the notification
+        await _flutterLocalNotificationsPlugin.zonedSchedule(
+          0,
+          title,
+          body,
+          tz.TZDateTime.from(scheduledTime, tz.local),
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              _personalizedChannelId,
+              _personalizedChannelName,
+              importance: Importance.max,
+              priority: Priority.high,
+            ),
+            iOS: DarwinNotificationDetails(
+              sound: 'default.wav',
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true,
+            ),
           ),
-          iOS: DarwinNotificationDetails(
-            sound: 'default.wav',
-            presentAlert: true,
-            presentBadge: true,
-            presentSound: true,
-          ),
-        ),
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-      );
+          androidAllowWhileIdle: true,
+          uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        );
 
-      // Save the scheduled notification to Firestore
-      await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('notifications')
-          .add({
-        'title': title,
-        'body': body,
-        'scheduledTime': scheduledTime,
-        'status': 'scheduled',
-        'timestamp': FieldValue.serverTimestamp(),
-      });
+        // Save the scheduled notification to Firestore
+        await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('notifications')
+            .add({
+          'title': title,
+          'body': body,
+          'scheduledTime': scheduledTime,
+          'status': 'scheduled',
+          'timestamp': FieldValue.serverTimestamp(),
+        });
 
-      print('Notification scheduled for ${scheduledTime.toString()} and saved to Firestore');
+        print('Notification scheduled for ${scheduledTime.toString()} and saved to Firestore');
+      }
+    } catch (e) {
+      print('Error scheduling notification: $e');
     }
-  } catch (e) {
-    print('Error scheduling notification: $e');
   }
-}
+
   Future<void> cancelNotification(int id) async {
     await _flutterLocalNotificationsPlugin.cancel(id);
   }
