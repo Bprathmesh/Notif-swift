@@ -39,7 +39,7 @@ class _SignInPageState extends State<SignInPage> {
       // Handle sign-in errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Sign-in error: $e'),
+          content: Text('Sign-in error: $e'),  
         ),
       );
     } finally {
