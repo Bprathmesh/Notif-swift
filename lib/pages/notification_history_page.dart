@@ -23,6 +23,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
   late StreamController<List<Map<String, dynamic>>> _streamController;
   late Stream<List<Map<String, dynamic>>> _combinedNotificationsStream;
   List<StreamSubscription> _subscriptions = [];
+  Timer? _periodicTimer;
 
   @override
   void initState() {
@@ -30,6 +31,8 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
     _streamController = StreamController<List<Map<String, dynamic>>>();
     _combinedNotificationsStream = _streamController.stream;
     _initializeStream();
+    // Set up a periodic timer to update the list every minute
+    _periodicTimer = Timer.periodic(Duration(minutes: 1), (_) => _updateCombinedList());
   }
 
   @override
@@ -38,6 +41,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
       subscription.cancel();
     }
     _streamController.close();
+    _periodicTimer?.cancel();
     super.dispose();
   }
 
@@ -92,12 +96,16 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
         });
       }
 
+      DateTime now = DateTime.now();
       for (var doc in scheduledNotificationsSnapshot.docs) {
-        combinedList.add({
-          ...doc.data(),
-          'id': doc.id,
-          'type': 'scheduled',
-        });
+        DateTime scheduledTime = (doc['scheduledTime'] as Timestamp).toDate();
+        if (scheduledTime.isBefore(now)) {
+          combinedList.add({
+            ...doc.data(),
+            'id': doc.id,
+            'type': 'scheduled',
+          });
+        }
       }
 
       combinedList.sort((a, b) {
@@ -125,7 +133,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
           IconButton(
             icon: Icon(themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode),
             onPressed: _toggleTheme,
-            tooltip: 'Change Theme',
+            tooltip: S.of(context).changeTheme,
           ),
         ],
       ),
