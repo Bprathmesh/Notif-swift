@@ -21,6 +21,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isLoading = false;
   bool _receivePromotions = false;
   bool _receiveUpdates = false;
+  bool _receiveNotifications = false;
   String _selectedLanguage = 'en';
 
   Future<void> _register() async {
@@ -43,8 +44,10 @@ class _RegisterPageState extends State<RegisterPage> {
           'fcmToken': fcmToken,
           'receivePromotions': _receivePromotions,
           'receiveUpdates': _receiveUpdates,
+          'receiveNotifications': _receiveNotifications,
           'createdAt': FieldValue.serverTimestamp(),
           'preferredLanguage': _selectedLanguage,
+          'interests': [], // Initialize with an empty list
         });
 
         // Set the user's preferred language
@@ -89,6 +92,15 @@ class _RegisterPageState extends State<RegisterPage> {
                 decoration: InputDecoration(labelText: S.of(context).password),
                 obscureText: true,
                 validator: (value) => value!.length < 6 ? S.of(context).passwordMustBe6Chars : null,
+              ),
+              SwitchListTile(
+                title: Text(S.of(context).receiveNotifications),
+                value: _receiveNotifications,
+                onChanged: (bool value) {
+                  setState(() {
+                    _receiveNotifications = value;
+                  });
+                },
               ),
               SwitchListTile(
                 title: Text(S.of(context).receivePromotions),
