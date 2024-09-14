@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mypushnotifications/pages/schedule_notification_page.dart';
 import 'package:mypushnotifications/services/auth_service.dart';
 import 'package:mypushnotifications/services/notification_service.dart';
 import 'package:mypushnotifications/services/firebase_service.dart';
@@ -45,6 +46,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _animationController.dispose();
     super.dispose();
   }
+  void _navigateToScheduleNotification() {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const ScheduleNotificationPage()),
+  );
+}
 
   void _toggleLanguage() {
     final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
@@ -152,28 +159,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
   }
 
-  Future<void> _scheduleNotification() async {
-  try {
-    await _notificationService.init();
-    DateTime scheduledTime = DateTime.now().add(const Duration(minutes: 1));
-    String? userId = _authService.getCurrentUser()?.uid;
-    if (userId != null) {
-      await _notificationService.scheduleNotification(
-        userId,
-        scheduledTime,
-        S.of(context).scheduledNotificationTitle,
-        S.of(context).scheduledNotificationBody,
-      );
-      _showSnackBar(S.of(context).notificationScheduled);
-    } else {
-      _showSnackBar(S.of(context).userNotLoggedIn);
-    }
-  } catch (e) {
-    print('Error scheduling notification: $e');
-    _showSnackBar(S.of(context).errorSchedulingNotification + ': ${e.toString()}');
-  }
-}
-
+  
   void _showSnackBar(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -282,9 +268,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   Text(S.of(context).sendTestNotifications, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   _buildNotificationButton(
-                    S.of(context).sendPersonalizedNotification,
-                    Icons.person,
-                    _sendPersonalizedNotification,
+                     S.of(context).scheduleNewNotification,
+                    Icons.schedule,
+                     _navigateToScheduleNotification,
                   ),
                   const SizedBox(height: 10),
                   _buildNotificationButton(
@@ -300,9 +286,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   ),
                   const SizedBox(height: 10),
                   _buildNotificationButton(
-                    S.of(context).scheduleNotification,
+                   S.of(context).scheduleNewNotification,
                     Icons.schedule,
-                    _scheduleNotification,
+                     _navigateToScheduleNotification,
                   ),
                 ],
               ),

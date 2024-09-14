@@ -959,6 +959,66 @@ class S {
       args: [],
     );
   }
+
+  /// `Schedule New Notification`
+  String get scheduleNewNotification {
+    return Intl.message(
+      'Schedule New Notification',
+      name: 'scheduleNewNotification',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notification Title`
+  String get notificationTitle {
+    return Intl.message(
+      'Notification Title',
+      name: 'notificationTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notification Body`
+  String get notificationBody {
+    return Intl.message(
+      'Notification Body',
+      name: 'notificationBody',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scheduled Time`
+  String get scheduledTime {
+    return Intl.message(
+      'Scheduled Time',
+      name: 'scheduledTime',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter a title`
+  String get pleaseEnterTitle {
+    return Intl.message(
+      'Please enter a title',
+      name: 'pleaseEnterTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter a body`
+  String get pleaseEnterBody {
+    return Intl.message(
+      'Please enter a body',
+      name: 'pleaseEnterBody',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

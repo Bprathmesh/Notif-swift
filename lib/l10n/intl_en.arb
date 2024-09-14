@@ -127,5 +127,12 @@
   "user": "User",
   "updateNotificationTitle": "App Update",
   "updateNotificationBody": "We have some exciting new features for you. Update now to explore!",
-  "scheduledNotificationTitle": "Scheduled Notification"
+  "scheduledNotificationTitle": "Scheduled Notification",
+  "scheduleNewNotification": "Schedule New Notification",
+  "notificationTitle": "Notification Title",
+  "notificationBody": "Notification Body",
+  "scheduledTime": "Scheduled Time",
+  "pleaseEnterTitle": "Please enter a title",
+  "pleaseEnterBody": "Please enter a body"
+  
 }

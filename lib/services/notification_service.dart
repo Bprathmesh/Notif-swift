@@ -350,19 +350,13 @@ class NotificationService {
     );
 
     // Store the scheduled notification info in Firestore
-    try {
-      await _firestore.collection('users').doc(userId).collection('scheduled_notifications').add({
-        'notificationId': notificationId,
-        'title': title,
-        'body': body,
-        'scheduledTime': scheduledTime,
-        'status': 'scheduled',
-      });
-    } catch (firestoreError) {
-      print('Error saving notification to Firestore: $firestoreError');
-      // If Firestore write fails, we should still consider the notification scheduled
-      // as it has been set up in the local notifications plugin
-    }
+    await _firestore.collection('users').doc(userId).collection('scheduled_notifications').add({
+      'notificationId': notificationId,
+      'title': title,
+      'body': body,
+      'scheduledTime': scheduledTime,
+      'status': 'scheduled',
+    });
 
     print('Notification scheduled successfully for $scheduledTime');
   } catch (e) {

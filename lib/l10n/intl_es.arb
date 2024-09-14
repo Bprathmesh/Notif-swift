@@ -126,5 +126,11 @@
   "user": "Usuario",
   "updateNotificationTitle": "Actualización de la App",
   "updateNotificationBody": "Tenemos nuevas funciones emocionantes para ti. ¡Actualiza ahora para explorarlas!",
-  "scheduledNotificationTitle": "Notificación Programada"
+  "scheduledNotificationTitle": "Notificación Programada",
+  "scheduleNewNotification": "Programar nueva notificación",
+  "notificationTitle": "Título de la notificación",
+  "notificationBody": "Cuerpo de la notificación",
+  "scheduledTime": "Hora programada",
+  "pleaseEnterTitle": "Por favor, introduce un título",
+  "pleaseEnterBody": "Por favor, introduce un cuerpo"
 }

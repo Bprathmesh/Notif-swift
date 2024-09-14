@@ -70,58 +70,55 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
   }
 
   void _updateCombinedList() async {
-    final user = _auth.currentUser;
-    if (user != null) {
-      var notificationsSnapshot = await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('notifications')
-          .orderBy('timestamp', descending: true)
-          .get();
+  final user = _auth.currentUser;
+  if (user != null) {
+    var notificationsSnapshot = await _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('notifications')
+        .orderBy('timestamp', descending: true)
+        .get();
 
-      var scheduledNotificationsSnapshot = await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('scheduled_notifications')
-          .orderBy('scheduledTime', descending: true)
-          .get();
+    var scheduledNotificationsSnapshot = await _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('scheduled_notifications')
+        .orderBy('scheduledTime', descending: true)
+        .get();
 
-      List<Map<String, dynamic>> combinedList = [];
+    List<Map<String, dynamic>> combinedList = [];
 
-      for (var doc in notificationsSnapshot.docs) {
-        combinedList.add({
-          ...doc.data(),
-          'id': doc.id,
-          'type': 'regular',
-        });
-      }
-
-      DateTime now = DateTime.now();
-      for (var doc in scheduledNotificationsSnapshot.docs) {
-        DateTime scheduledTime = (doc['scheduledTime'] as Timestamp).toDate();
-        if (scheduledTime.isBefore(now)) {
-          combinedList.add({
-            ...doc.data(),
-            'id': doc.id,
-            'type': 'scheduled',
-          });
-        }
-      }
-
-      combinedList.sort((a, b) {
-        DateTime aTime = a['type'] == 'regular' 
-            ? (a['timestamp'] as Timestamp).toDate() 
-            : (a['scheduledTime'] as Timestamp).toDate();
-        DateTime bTime = b['type'] == 'regular' 
-            ? (b['timestamp'] as Timestamp).toDate() 
-            : (b['scheduledTime'] as Timestamp).toDate();
-        return bTime.compareTo(aTime);
+    for (var doc in notificationsSnapshot.docs) {
+      combinedList.add({
+        ...doc.data(),
+        'id': doc.id,
+        'type': 'regular',
       });
-
-      _streamController.add(combinedList);
     }
-  }
 
+    DateTime now = DateTime.now();
+    for (var doc in scheduledNotificationsSnapshot.docs) {
+      DateTime scheduledTime = (doc['scheduledTime'] as Timestamp).toDate();
+      combinedList.add({
+        ...doc.data(),
+        'id': doc.id,
+        'type': scheduledTime.isAfter(now) ? 'scheduled' : 'sent',
+      });
+    }
+
+    combinedList.sort((a, b) {
+      DateTime aTime = a['type'] == 'regular' 
+          ? (a['timestamp'] as Timestamp).toDate() 
+          : (a['scheduledTime'] as Timestamp).toDate();
+      DateTime bTime = b['type'] == 'regular' 
+          ? (b['timestamp'] as Timestamp).toDate() 
+          : (b['scheduledTime'] as Timestamp).toDate();
+      return bTime.compareTo(aTime);
+    });
+
+    _streamController.add(combinedList);
+  }
+}
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);

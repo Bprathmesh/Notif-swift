@@ -96,6 +96,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "noNotifications":
             MessageLookupByLibrary.simpleMessage("Sin notificaciones"),
         "noTitle": MessageLookupByLibrary.simpleMessage("Sin título"),
+        "notificationBody":
+            MessageLookupByLibrary.simpleMessage("Cuerpo de la notificación"),
         "notificationDeleted":
             MessageLookupByLibrary.simpleMessage("Notificación eliminada"),
         "notificationHistoryPage":
@@ -104,6 +106,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Sus preferencias de notificación han sido actualizadas."),
         "notificationScheduled": MessageLookupByLibrary.simpleMessage(
             "Notificación programada para 1 minuto desde ahora"),
+        "notificationTitle":
+            MessageLookupByLibrary.simpleMessage("Título de la notificación"),
         "password": MessageLookupByLibrary.simpleMessage("Contraseña"),
         "passwordMustBe6Chars": MessageLookupByLibrary.simpleMessage(
             "La contraseña debe tener al menos 6 caracteres"),
@@ -113,10 +117,14 @@ class MessageLookup extends MessageLookupByLibrary {
             "Notificación personalizada enviada"),
         "personalizedNotificationTitle":
             MessageLookupByLibrary.simpleMessage("Notificación Personalizada"),
+        "pleaseEnterBody": MessageLookupByLibrary.simpleMessage(
+            "Por favor, introduce un cuerpo"),
         "pleaseEnterEmail": MessageLookupByLibrary.simpleMessage(
             "Por favor, ingrese un correo electrónico"),
         "pleaseEnterName": MessageLookupByLibrary.simpleMessage(
             "Por favor, ingrese su nombre"),
+        "pleaseEnterTitle": MessageLookupByLibrary.simpleMessage(
+            "Por favor, introduce un título"),
         "preferences": MessageLookupByLibrary.simpleMessage("Preferencias"),
         "preferencesSaved": MessageLookupByLibrary.simpleMessage(
             "Preferencias guardadas exitosamente"),
@@ -137,6 +145,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "registrationFailed": m5,
         "savePreferences":
             MessageLookupByLibrary.simpleMessage("Guardar Preferencias"),
+        "scheduleNewNotification": MessageLookupByLibrary.simpleMessage(
+            "Programar nueva notificación"),
         "scheduleNotification":
             MessageLookupByLibrary.simpleMessage("Programar Notificación"),
         "scheduledFor": m6,
@@ -144,6 +154,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("¡Oferta Especial!"),
         "scheduledNotificationTitle":
             MessageLookupByLibrary.simpleMessage("Notificación Programada"),
+        "scheduledTime":
+            MessageLookupByLibrary.simpleMessage("Hora programada"),
         "sendPersonalizedNotification": MessageLookupByLibrary.simpleMessage(
             "Enviar Notificación Personalizada"),
         "sendPromotionalNotification": MessageLookupByLibrary.simpleMessage(
