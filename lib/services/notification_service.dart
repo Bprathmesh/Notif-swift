@@ -213,7 +213,7 @@ class NotificationService {
       DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
       
       if (userDoc.exists) {
-        AppUser.User appUser = AppUser.User.fromMap(userDoc.data() as Map<String, dynamic>);
+        AppUser.User appUser = AppUser.User.fromMap(userDoc.data() as Map<String, dynamic>, userDoc.id);
 
         if (appUser.receiveNotifications) {
           String personalizedTitle = S.of(context).hello(appUser.name);

@@ -32,6 +32,27 @@ class AuthService {
       return null;
     }
   }
+  Future<void> deleteUser(String userId) async {
+    try {
+      // Get an instance of FirebaseAuth
+      FirebaseAuth auth = FirebaseAuth.instance;
+
+      // Get the current user
+      User? currentUser = auth.currentUser;
+
+      if (currentUser != null && currentUser.uid == userId) {
+        // If the user to be deleted is the current user, delete them directly
+        await currentUser.delete();
+      } else {
+        // If it's a different user, you'll need admin SDK or Cloud Functions
+        // This is just a placeholder - implement your server-side logic here
+        throw Exception('Deleting other users requires admin privileges');
+      }
+    } catch (e) {
+      print('Error deleting user: $e');
+      rethrow;
+    }
+  }
 
   // Method to sign out the current user
   Future<void> signOut() async {

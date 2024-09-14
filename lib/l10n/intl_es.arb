@@ -132,5 +132,15 @@
   "notificationBody": "Cuerpo de la notificación",
   "scheduledTime": "Hora programada",
   "pleaseEnterTitle": "Por favor, introduce un título",
-  "pleaseEnterBody": "Por favor, introduce un cuerpo"
+  "pleaseEnterBody": "Por favor, introduce un cuerpo",
+  "adminLogin": "Inicio de sesión de administrador",
+  "adminPassword": "Contraseña de administrador",
+  "pleaseEnterPassword": "Por favor, introduce la contraseña de administrador",
+  "invalidAdminPassword": "Contraseña de administrador no válida",
+  "login": "Iniciar sesión",
+  "adminPanel": "Panel de administración",
+  "errorLoadingUsers": "Error al cargar los usuarios: {error}",
+  "userDeletedSuccessfully": "Usuario eliminado exitosamente",
+  "errorDeletingUser": "Error al eliminar el usuario",
+   "errorDeletingUser": "Error al eliminar el usuario"
 }

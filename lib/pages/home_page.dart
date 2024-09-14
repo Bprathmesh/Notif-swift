@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mypushnotifications/pages/admin_login_page.dart';
+import 'package:mypushnotifications/pages/admin_page.dart';
 import 'package:mypushnotifications/pages/schedule_notification_page.dart';
 import 'package:mypushnotifications/services/auth_service.dart';
 import 'package:mypushnotifications/services/notification_service.dart';
@@ -289,6 +291,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   S.of(context).scheduleNewNotification,
                   Icons.schedule,
                   _navigateToScheduleNotification,
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AdminLoginPage()),
+                ),
+                child: Text(S.of(context).adminLogin),
                 ),
                 ],
               ),

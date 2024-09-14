@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mypushnotifications/generated/l10n.dart';
+import 'package:mypushnotifications/pages/admin_page.dart';
 import 'package:mypushnotifications/pages/home_page.dart';
 import 'package:mypushnotifications/pages/sign_in_page.dart';
 import 'package:mypushnotifications/pages/register_page.dart';
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterPage(),
         '/notification_history': (context) => const NotificationHistoryPage(),
         '/preferences': (context) => const PreferencesPage(),
+        '/admin': (context) => const AdminPage()
       },
         );
       },

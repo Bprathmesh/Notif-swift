@@ -1019,6 +1019,96 @@ class S {
       args: [],
     );
   }
+
+  /// `Admin Login`
+  String get adminLogin {
+    return Intl.message(
+      'Admin Login',
+      name: 'adminLogin',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Admin Password`
+  String get adminPassword {
+    return Intl.message(
+      'Admin Password',
+      name: 'adminPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter the admin password`
+  String get pleaseEnterPassword {
+    return Intl.message(
+      'Please enter the admin password',
+      name: 'pleaseEnterPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invalid admin password`
+  String get invalidAdminPassword {
+    return Intl.message(
+      'Invalid admin password',
+      name: 'invalidAdminPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Login`
+  String get login {
+    return Intl.message(
+      'Login',
+      name: 'login',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Admin Panel`
+  String get adminPanel {
+    return Intl.message(
+      'Admin Panel',
+      name: 'adminPanel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Error loading users: {error}`
+  String errorLoadingUsers(Object error) {
+    return Intl.message(
+      'Error loading users: $error',
+      name: 'errorLoadingUsers',
+      desc: '',
+      args: [error],
+    );
+  }
+
+  /// `User deleted successfully`
+  String get userDeletedSuccessfully {
+    return Intl.message(
+      'User deleted successfully',
+      name: 'userDeletedSuccessfully',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Error deleting user`
+  String get errorDeletingUser {
+    return Intl.message(
+      'Error deleting user',
+      name: 'errorDeletingUser',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

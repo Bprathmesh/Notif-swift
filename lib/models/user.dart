@@ -11,7 +11,7 @@ class User {
   final List<String> interests;
   final DateTime lastLogin;
   final DateTime createdAt;
-  final String preferredLanguage; // New field
+  final String preferredLanguage;
 
   User({
     required this.id,
@@ -24,25 +24,24 @@ class User {
     required this.interests,
     required this.lastLogin,
     required this.createdAt,
-    required this.preferredLanguage, // New field
+    required this.preferredLanguage,
   });
 
-  factory User.fromMap(Map<String, dynamic> map) {
-    return User(
-      id: map['id'] as String? ?? '',
-      name: map['name'] as String? ?? '',
-      email: map['email'] as String? ?? '',
-      receivePromotions: map['receivePromotions'] as bool? ?? false,
-      receiveUpdates: map['receiveUpdates'] as bool? ?? false,
-      receiveNotifications: map['receiveNotifications'] as bool? ?? false,
-      fcmToken: map['fcmToken'] as String? ?? '',
-      interests: List<String>.from(map['interests'] ?? []),
-      lastLogin: (map['lastLogin'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      preferredLanguage: map['preferredLanguage'] as String? ?? 'en', // New field
-    );
-  }
-
+  factory User.fromMap(Map<String, dynamic> map, String id) {
+  return User(
+    id: id,
+    name: map['name'] as String? ?? '',
+    email: map['email'] as String? ?? '',
+    receivePromotions: map['receivePromotions'] as bool? ?? false,
+    receiveUpdates: map['receiveUpdates'] as bool? ?? false,
+    receiveNotifications: map['receiveNotifications'] as bool? ?? false,
+    fcmToken: map['fcmToken'] as String? ?? '',
+    interests: List<String>.from(map['interests'] ?? []),
+    lastLogin: (map['lastLogin'] as Timestamp?)?.toDate() ?? DateTime.now(),
+    createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+    preferredLanguage: map['preferredLanguage'] as String? ?? 'en',
+  );
+}
   Map<String, dynamic> toMap() {
     return {
       'id': id,

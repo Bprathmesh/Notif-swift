@@ -133,6 +133,17 @@
   "notificationBody": "Notification Body",
   "scheduledTime": "Scheduled Time",
   "pleaseEnterTitle": "Please enter a title",
-  "pleaseEnterBody": "Please enter a body"
+  "pleaseEnterBody": "Please enter a body",
+  "adminLogin": "Admin Login",
+  "adminPassword": "Admin Password",
+  "pleaseEnterPassword": "Please enter the admin password",
+  "invalidAdminPassword": "Invalid admin password",
+  "login": "Login",
+  "adminPanel": "Admin Panel",
+  "errorLoadingUsers": "Error loading users: {error}",
+  "userDeletedSuccessfully": "User deleted successfully",
+  "errorDeletingUser": "Error deleting user"
+  
+
   
 }

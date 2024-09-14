@@ -34,39 +34,38 @@ class _PreferencesPageState extends State<PreferencesPage> {
   }
 
   Future<void> _loadUserPreferences() async {
-    setState(() {
-      _isLoading = true;
-    });
+  setState(() {
+    _isLoading = true;
+  });
 
-    final userId = _auth.currentUser!.uid;
-    final userDoc = await _firestore.collection('users').doc(userId).get();
-    
-    if (userDoc.exists) {
-      _user = AppUser.User.fromMap(userDoc.data()!..['id'] = userId);
-    } else {
-      // Handle the case where the user document doesn't exist
-      _user = AppUser.User(
-        id: userId,
-        name: _auth.currentUser!.displayName ?? '',
-        email: _auth.currentUser!.email ?? '',
-        receivePromotions: false,
-        receiveUpdates: false,
-        receiveNotifications: false,
-        fcmToken: '',
-        interests: [],
-        lastLogin: DateTime.now(),
-        createdAt: DateTime.now(),
-        preferredLanguage: 'en',
-      );
-      // Create the user document in Firestore
-      await _firestore.collection('users').doc(userId).set(_user.toMap());
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
+  final userId = _auth.currentUser!.uid;
+  final userDoc = await _firestore.collection('users').doc(userId).get();
+  
+  if (userDoc.exists) {
+    _user = AppUser.User.fromMap(userDoc.data() ?? {}, userId);
+  } else {
+    // Handle the case where the user document doesn't exist
+    _user = AppUser.User(
+      id: userId,
+      name: _auth.currentUser!.displayName ?? '',
+      email: _auth.currentUser!.email ?? '',
+      receivePromotions: false,
+      receiveUpdates: false,
+      receiveNotifications: false,
+      fcmToken: '',
+      interests: [],
+      lastLogin: DateTime.now(),
+      createdAt: DateTime.now(),
+      preferredLanguage: 'en',
+    );
+    // Create the user document in Firestore
+    await _firestore.collection('users').doc(userId).set(_user.toMap());
   }
 
+  setState(() {
+    _isLoading = false;
+  });
+}
   Future<void> _savePreferences() async {
     setState(() {
       _isLoading = true;

@@ -22,22 +22,27 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m0(string) => "Error: ${string}";
 
-  static String m1(error) => "Failed to save preferences: ${error}";
+  static String m1(error) => "Error loading users: ${error}";
 
-  static String m2(name) => "Hello ${name}";
+  static String m2(error) => "Failed to save preferences: ${error}";
 
-  static String m3(interest) => "${interest}";
+  static String m3(name) => "Hello ${name}";
 
-  static String m4(name) => "${name}, check out our latest promotion!";
+  static String m4(interest) => "${interest}";
 
-  static String m5(error) => "Registration failed: ${error}";
+  static String m5(name) => "${name}, check out our latest promotion!";
 
-  static String m6(format) => "Scheduled for: ${format}";
+  static String m6(error) => "Registration failed: ${error}";
 
-  static String m7(format) => "Sent: ${format}";
+  static String m7(format) => "Scheduled for: ${format}";
+
+  static String m8(format) => "Sent: ${format}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "adminLogin": MessageLookupByLibrary.simpleMessage("Admin Login"),
+        "adminPanel": MessageLookupByLibrary.simpleMessage("Admin Panel"),
+        "adminPassword": MessageLookupByLibrary.simpleMessage("Admin Password"),
         "changeLanguage":
             MessageLookupByLibrary.simpleMessage("Change Language"),
         "changeTheme": MessageLookupByLibrary.simpleMessage("Change Theme"),
@@ -48,10 +53,13 @@ class MessageLookup extends MessageLookupByLibrary {
         "email": MessageLookupByLibrary.simpleMessage("Email"),
         "english": MessageLookupByLibrary.simpleMessage("English"),
         "error": m0,
+        "errorDeletingUser":
+            MessageLookupByLibrary.simpleMessage("Error deleting user"),
         "errorFetchingNotifications": MessageLookupByLibrary.simpleMessage(
             "Error fetching notifications. Please try again."),
         "errorInitializingNotifications": MessageLookupByLibrary.simpleMessage(
             "Error initializing notifications. Please try again later."),
+        "errorLoadingUsers": m1,
         "errorSchedulingNotification": MessageLookupByLibrary.simpleMessage(
             "Error scheduling notification. Please try again."),
         "errorSendingPersonalizedNotification":
@@ -69,7 +77,7 @@ class MessageLookup extends MessageLookupByLibrary {
                 "Error updating notification settings. Please try again."),
         "failedToDeleteNotification": MessageLookupByLibrary.simpleMessage(
             "Failed to delete notification"),
-        "failedToSavePreferences": m1,
+        "failedToSavePreferences": m2,
         "fashion": MessageLookupByLibrary.simpleMessage("Fashion"),
         "finance": MessageLookupByLibrary.simpleMessage("Finance"),
         "food": MessageLookupByLibrary.simpleMessage("Food"),
@@ -80,11 +88,14 @@ class MessageLookup extends MessageLookupByLibrary {
         "foodMessage3": MessageLookupByLibrary.simpleMessage(
             "New cooking tutorial: Learn to make gourmet dishes at home."),
         "health": MessageLookupByLibrary.simpleMessage("Health"),
-        "hello": m2,
+        "hello": m3,
         "homePage": MessageLookupByLibrary.simpleMessage("Home Page"),
-        "interest": m3,
+        "interest": m4,
         "interests": MessageLookupByLibrary.simpleMessage("Interests"),
+        "invalidAdminPassword":
+            MessageLookupByLibrary.simpleMessage("Invalid admin password"),
         "language": MessageLookupByLibrary.simpleMessage("Language"),
+        "login": MessageLookupByLibrary.simpleMessage("Login"),
         "music": MessageLookupByLibrary.simpleMessage("Music"),
         "musicMessage1": MessageLookupByLibrary.simpleMessage(
             "Your favorite artist just released a new album!"),
@@ -125,6 +136,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Please enter an email"),
         "pleaseEnterName":
             MessageLookupByLibrary.simpleMessage("Please enter your name"),
+        "pleaseEnterPassword": MessageLookupByLibrary.simpleMessage(
+            "Please enter the admin password"),
         "pleaseEnterTitle":
             MessageLookupByLibrary.simpleMessage("Please enter a title"),
         "preferences": MessageLookupByLibrary.simpleMessage("Preferences"),
@@ -132,7 +145,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Preferences saved successfully"),
         "preferencesUpdated":
             MessageLookupByLibrary.simpleMessage("Preferences Updated"),
-        "promotionalNotificationBody": m4,
+        "promotionalNotificationBody": m5,
         "promotionalNotificationSent": MessageLookupByLibrary.simpleMessage(
             "Promotional notification sent"),
         "promotionalNotificationTitle":
@@ -144,14 +157,14 @@ class MessageLookup extends MessageLookupByLibrary {
         "receiveUpdates":
             MessageLookupByLibrary.simpleMessage("Receive Updates"),
         "register": MessageLookupByLibrary.simpleMessage("Register"),
-        "registrationFailed": m5,
+        "registrationFailed": m6,
         "savePreferences":
             MessageLookupByLibrary.simpleMessage("Save Preferences"),
         "scheduleNewNotification":
             MessageLookupByLibrary.simpleMessage("Schedule New Notification"),
         "scheduleNotification":
             MessageLookupByLibrary.simpleMessage("Schedule Notification"),
-        "scheduledFor": m6,
+        "scheduledFor": m7,
         "scheduledNotificationBody": MessageLookupByLibrary.simpleMessage(
             "This is a test scheduled notification"),
         "scheduledNotificationTitle":
@@ -165,7 +178,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Send Test Notifications"),
         "sendUpdateNotification":
             MessageLookupByLibrary.simpleMessage("Send Update Notification"),
-        "sent": m7,
+        "sent": m8,
         "signIn": MessageLookupByLibrary.simpleMessage("Sign In"),
         "spanish": MessageLookupByLibrary.simpleMessage("Spanish"),
         "sports": MessageLookupByLibrary.simpleMessage("Sports"),
@@ -196,6 +209,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "updateNotificationTitle":
             MessageLookupByLibrary.simpleMessage("App Update"),
         "user": MessageLookupByLibrary.simpleMessage("User"),
+        "userDeletedSuccessfully":
+            MessageLookupByLibrary.simpleMessage("User deleted successfully"),
         "userNotLoggedIn": MessageLookupByLibrary.simpleMessage(
             "User not logged in. Cannot send notification."),
         "viewNotificationHistory":
