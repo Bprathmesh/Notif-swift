@@ -69,7 +69,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
     }
   }
 
-  void _updateCombinedList() async {
+ void _updateCombinedList() async {
   final user = _auth.currentUser;
   if (user != null) {
     var notificationsSnapshot = await _firestore
@@ -88,6 +88,8 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
 
     List<Map<String, dynamic>> combinedList = [];
 
+    DateTime now = DateTime.now();
+
     for (var doc in notificationsSnapshot.docs) {
       combinedList.add({
         ...doc.data(),
@@ -96,14 +98,15 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
       });
     }
 
-    DateTime now = DateTime.now();
     for (var doc in scheduledNotificationsSnapshot.docs) {
       DateTime scheduledTime = (doc['scheduledTime'] as Timestamp).toDate();
-      combinedList.add({
-        ...doc.data(),
-        'id': doc.id,
-        'type': scheduledTime.isAfter(now) ? 'scheduled' : 'sent',
-      });
+      if (scheduledTime.isBefore(now)) {
+        combinedList.add({
+          ...doc.data(),
+          'id': doc.id,
+          'type': 'scheduled',
+        });
+      }
     }
 
     combinedList.sort((a, b) {

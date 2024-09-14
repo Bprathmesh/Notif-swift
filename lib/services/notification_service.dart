@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -88,7 +86,6 @@ class NotificationService {
       print('Error initializing NotificationService: $e');
     }
   }
-
   Future<void> _createNotificationChannels() async {
     const AndroidNotificationChannel defaultChannel = AndroidNotificationChannel(
       _defaultChannelId,
@@ -326,74 +323,87 @@ class NotificationService {
       print('Error sending update notification: $e');
     }
   }
-
   Future<void> scheduleNotification(String userId, DateTime scheduledTime, String title, String body) async {
-  try {
-    final int notificationId = DateTime.now().millisecondsSinceEpoch.remainder(100000);
+    try {
+      final int notificationId = DateTime.now().millisecondsSinceEpoch.remainder(100000);
 
-    await _flutterLocalNotificationsPlugin.zonedSchedule(
-      notificationId,
-      title,
-      body,
-      tz.TZDateTime.from(scheduledTime, tz.local),
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          _scheduledChannelId,
-          _scheduledChannelName,
-          importance: Importance.max,
-          priority: Priority.high,
+      await _flutterLocalNotificationsPlugin.zonedSchedule(
+        notificationId,
+        title,
+        body,
+        tz.TZDateTime.from(scheduledTime, tz.local),
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            _scheduledChannelId,
+            _scheduledChannelName,
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
         ),
-      ),
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+        payload: '$userId|$title|$body', // Add this line
+      );
 
-    // Store the scheduled notification info in Firestore
-    await _firestore.collection('users').doc(userId).collection('scheduled_notifications').add({
-      'notificationId': notificationId,
-      'title': title,
-      'body': body,
-      'scheduledTime': scheduledTime,
-      'status': 'scheduled',
-    });
+      // Store the scheduled notification info in Firestore
+      await _firestore.collection('users').doc(userId).collection('scheduled_notifications').add({
+        'notificationId': notificationId,
+        'title': title,
+        'body': body,
+        'scheduledTime': scheduledTime,
+        'status': 'scheduled',
+      });
 
-    print('Notification scheduled successfully for $scheduledTime');
-  } catch (e) {
-    print('Error scheduling notification: $e');
-    throw Exception('Failed to schedule notification: $e');
+      print('Notification scheduled successfully for $scheduledTime');
+    } catch (e) {
+      print('Error scheduling notification: $e');
+      throw Exception('Failed to schedule notification: $e');
+    }
   }
-}
- Future<void> _handleNotificationResponse(NotificationResponse response) async {
-    final String? notificationIdString = response.id?.toString();
-    final int? notificationId = notificationIdString != null ? int.tryParse(notificationIdString) : null;
-    final user = _auth.currentUser;
 
-    if (user != null && notificationId != null) {
-      // Find the scheduled notification document
-      QuerySnapshot scheduledNotifications = await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('scheduled_notifications')
-          .where('notificationId', isEqualTo: notificationId)
-          .get();
-
-      if (scheduledNotifications.docs.isNotEmpty) {
-        DocumentSnapshot scheduledNotification = scheduledNotifications.docs.first;
-        
-        // Move the notification to the history
-        await _firestore.collection('users').doc(user.uid).collection('notifications').add({
-          'title': scheduledNotification['title'],
-          'body': scheduledNotification['body'],
-          'timestamp': FieldValue.serverTimestamp(),
-          'status': 'sent',
-        });
-
-        // Delete the scheduled notification document
-        await scheduledNotification.reference.delete();
+  Future<void> _handleNotificationResponse(NotificationResponse response) async {
+    final String? payload = response.payload;
+    if (payload != null) {
+      List<String> parts = payload.split('|');
+      if (parts.length == 3) {
+        String userId = parts[0];
+        String title = parts[1];
+        String body = parts[2];
+        await _moveScheduledNotificationToHistory(userId, title, body);
       }
     }
   }
+
+  Future<void> _moveScheduledNotificationToHistory(String userId, String title, String body) async {
+    try {
+      // Add to notifications collection
+      await _firestore.collection('users').doc(userId).collection('notifications').add({
+        'title': title,
+        'body': body,
+        'timestamp': FieldValue.serverTimestamp(),
+        'status': 'sent',
+      });
+
+      // Remove from scheduled_notifications collection
+      QuerySnapshot scheduledNotifications = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('scheduled_notifications')
+          .where('title', isEqualTo: title)
+          .where('body', isEqualTo: body)
+          .get();
+
+      if (scheduledNotifications.docs.isNotEmpty) {
+        await scheduledNotifications.docs.first.reference.delete();
+      }
+
+      print('Scheduled notification moved to history');
+    } catch (e) {
+      print('Error moving scheduled notification to history: $e');
+    }
+  }
+
   Future<void> cancelNotification(int id) async {
     await _flutterLocalNotificationsPlugin.cancel(id);
   }
@@ -402,7 +412,7 @@ class NotificationService {
     await _flutterLocalNotificationsPlugin.cancelAll();
   }
 
-   Future<void> deleteNotification(String notificationId, String type) async {
+  Future<void> deleteNotification(String notificationId, String type) async {
     try {
       final user = _auth.currentUser;
       if (user == null) {
@@ -418,6 +428,23 @@ class NotificationService {
           .collection(collectionName)
           .doc(notificationId)
           .delete();
+
+      if (type == 'scheduled') {
+        // Cancel the scheduled notification
+        DocumentSnapshot notificationDoc = await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection(collectionName)
+            .doc(notificationId)
+            .get();
+        
+        if (notificationDoc.exists) {
+          int? notificationId = notificationDoc.get('notificationId') as int?;
+          if (notificationId != null) {
+            await cancelNotification(notificationId);
+          }
+        }
+      }
 
       print('Notification with ID $notificationId deleted successfully from $collectionName.');
     } catch (e) {
