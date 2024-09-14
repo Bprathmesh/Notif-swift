@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mypushnotifications/generated/l10n.dart';
-import 'pages/home_page.dart';
-import 'pages/sign_in_page.dart';
-import 'pages/register_page.dart';
-import 'pages/notification_history_page.dart';
-import 'pages/preferences_page.dart';
-import 'pages/wrapper.dart';
+import 'package:mypushnotifications/pages/home_page.dart';
+import 'package:mypushnotifications/pages/sign_in_page.dart';
+import 'package:mypushnotifications/pages/register_page.dart';
+import 'package:mypushnotifications/pages/notification_history_page.dart';
+import 'package:mypushnotifications/pages/preferences_page.dart';
+import 'package:mypushnotifications/pages/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'services/notification_service.dart';
 import 'phoenix.dart';
 import 'package:provider/provider.dart';
 import 'package:mypushnotifications/providers/theme_provider.dart';
 import 'package:mypushnotifications/providers/language_provider.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -54,13 +53,13 @@ class MyApp extends StatelessWidget {
           locale: languageProvider.currentLocale,
           initialRoute: '/',
           routes: {
-            '/': (context) => const Wrapper(),
-            '/home': (context) => const HomePage(),
-            '/sign_in': (context) => const SignInPage(),
-            '/register': (context) => const RegisterPage(),
-            '/notification_history': (context) => const NotificationHistoryPage(),
-            '/preferences': (context) => const PreferencesPage(),
-          },
+        '/': (context) => const Wrapper(),
+        '/home': (context) => const HomePage(),
+        '/sign_in': (context) => const SignInPage(),
+        '/register': (context) => const RegisterPage(),
+        '/notification_history': (context) => const NotificationHistoryPage(),
+        '/preferences': (context) => const PreferencesPage(),
+      },
         );
       },
     );

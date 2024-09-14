@@ -37,6 +37,7 @@
       "format": {}
     }
   },
+  "errorFetchingNotifications": "Error fetching notifications. Please try again.",
   "scheduledFor": "Scheduled for: {format}",
   "@scheduledFor": {
     "placeholders": {
@@ -49,6 +50,7 @@
       "string": {}
     }
   },
+  "scheduledNotificationBody": "This is a test scheduled notification",
   "technology": "Technology",
   "sports": "Sports",
   "music": "Music",

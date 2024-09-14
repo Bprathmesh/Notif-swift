@@ -98,6 +98,8 @@
       "error": {}
     }
   },
+  "errorFetchingNotifications": "Error al recuperar las notificaciones. Por favor, reintente.",
+  "scheduledNotificationBody": "¡Oferta Especial!",
   "welcomeBack": "¡Bienvenido de nuevo!",
   "createAccount": "Crear una cuenta",
   "preferences": "Preferencias",

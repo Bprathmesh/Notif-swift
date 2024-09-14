@@ -370,6 +370,16 @@ class S {
     );
   }
 
+  /// `Error fetching notifications. Please try again.`
+  String get errorFetchingNotifications {
+    return Intl.message(
+      'Error fetching notifications. Please try again.',
+      name: 'errorFetchingNotifications',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Scheduled for: {format}`
   String scheduledFor(Object format) {
     return Intl.message(
@@ -387,6 +397,16 @@ class S {
       name: 'error',
       desc: '',
       args: [string],
+    );
+  }
+
+  /// `This is a test scheduled notification`
+  String get scheduledNotificationBody {
+    return Intl.message(
+      'This is a test scheduled notification',
+      name: 'scheduledNotificationBody',
+      desc: '',
+      args: [],
     );
   }
 

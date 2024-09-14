@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print
-
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -75,9 +73,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     } catch (e) {
       print('Error initializing notifications: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context).errorInitializingNotifications)),
-        );
+        _showSnackBar(S.of(context).errorInitializingNotifications);
       }
     }
   }
@@ -157,20 +153,49 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Future<void> _scheduleNotification() async {
-    try {
-      await _notificationService.init();
-      DateTime scheduledTime = DateTime.now().add(const Duration(minutes: 1));
-      String? userId = _authService.getCurrentUser()?.uid;
-      if (userId != null) {
-        await _notificationService.scheduleNotification(userId, scheduledTime, context);
-        _showSnackBar(S.of(context).notificationScheduled);
-      } else {
-        _showSnackBar(S.of(context).userNotLoggedIn);
-      }
-    } catch (e) {
-      print('Error scheduling notification: $e');
-      _showSnackBar(S.of(context).errorSchedulingNotification);
+  try {
+    await _notificationService.init();
+    DateTime scheduledTime = DateTime.now().add(const Duration(minutes: 1));
+    String? userId = _authService.getCurrentUser()?.uid;
+    if (userId != null) {
+      await _notificationService.scheduleNotification(
+        userId,
+        scheduledTime,
+        S.of(context).scheduledNotificationTitle,
+        S.of(context).scheduledNotificationBody,
+      );
+      _showSnackBar(S.of(context).notificationScheduled);
+    } else {
+      _showSnackBar(S.of(context).userNotLoggedIn);
     }
+  } catch (e) {
+    print('Error scheduling notification: $e');
+    _showSnackBar(S.of(context).errorSchedulingNotification + ': ${e.toString()}');
+  }
+}
+
+  void _showSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+    }
+  }
+
+  Widget _buildNotificationButton(String text, IconData icon, VoidCallback onPressed) {
+    return ElevatedButton.icon(
+      icon: Icon(icon),
+      label: Text(text),
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
   @override
@@ -284,28 +309,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildNotificationButton(String text, IconData icon, VoidCallback onPressed) {
-    return ElevatedButton.icon(
-      icon: Icon(icon),
-      label: Text(text),
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
-  }
-
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }

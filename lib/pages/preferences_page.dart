@@ -122,19 +122,6 @@ class _PreferencesPageState extends State<PreferencesPage> {
       S.of(context).finance,
     ];
   }
-  String _getLocalizedInterest(BuildContext context, String interest) {
-    Map<String, String> interestMap = {
-      'Technology': S.of(context).technology,
-      'Sports': S.of(context).sports,
-      'Music': S.of(context).music,
-      'Travel': S.of(context).travel,
-      'Food': S.of(context).food,
-      'Fashion': S.of(context).fashion,
-      'Health': S.of(context).health,
-      'Finance': S.of(context).finance,
-    };
-    return interestMap[interest] ?? interest;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -254,9 +241,6 @@ class _PreferencesPageState extends State<PreferencesPage> {
                   child: ElevatedButton(
                     onPressed: _savePreferences,
                     child: Text(S.of(context).savePreferences),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
                   ),
                 ),
               ],

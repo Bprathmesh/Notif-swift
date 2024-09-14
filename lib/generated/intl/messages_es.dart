@@ -48,6 +48,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "email": MessageLookupByLibrary.simpleMessage("Correo Electrónico"),
         "english": MessageLookupByLibrary.simpleMessage("Inglés"),
         "error": m0,
+        "errorFetchingNotifications": MessageLookupByLibrary.simpleMessage(
+            "Error al recuperar las notificaciones. Por favor, reintente."),
         "errorInitializingNotifications": MessageLookupByLibrary.simpleMessage(
             "Error al iniciar las notificaciones. Por favor, inténtelo de nuevo más tarde."),
         "errorSchedulingNotification": MessageLookupByLibrary.simpleMessage(
@@ -138,6 +140,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "scheduleNotification":
             MessageLookupByLibrary.simpleMessage("Programar Notificación"),
         "scheduledFor": m6,
+        "scheduledNotificationBody":
+            MessageLookupByLibrary.simpleMessage("¡Oferta Especial!"),
         "scheduledNotificationTitle":
             MessageLookupByLibrary.simpleMessage("Notificación Programada"),
         "sendPersonalizedNotification": MessageLookupByLibrary.simpleMessage(
