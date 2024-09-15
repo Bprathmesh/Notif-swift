@@ -46,6 +46,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "activeUsers": MessageLookupByLibrary.simpleMessage("Active Users"),
         "admin": MessageLookupByLibrary.simpleMessage("Admin"),
         "adminLogin": MessageLookupByLibrary.simpleMessage("Admin Login"),
         "adminPanel": MessageLookupByLibrary.simpleMessage("Admin Panel"),
@@ -56,6 +57,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Admin privileges are required for this action."),
         "adminStatusUpdated": MessageLookupByLibrary.simpleMessage(
             "Admin status updated successfully"),
+        "analytics": MessageLookupByLibrary.simpleMessage("Analytics"),
         "areYouSureDeleteUser": m0,
         "becomeAdmin": MessageLookupByLibrary.simpleMessage("Become Admin"),
         "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
@@ -112,6 +114,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "New cooking tutorial: Learn to make gourmet dishes at home."),
         "health": MessageLookupByLibrary.simpleMessage("Health"),
         "hello": m6,
+        "highActivity": MessageLookupByLibrary.simpleMessage("High Activity"),
         "homePage": MessageLookupByLibrary.simpleMessage("Home Page"),
         "incorrectAdminPassword":
             MessageLookupByLibrary.simpleMessage("Incorrect admin password"),
@@ -121,6 +124,9 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Invalid admin password"),
         "language": MessageLookupByLibrary.simpleMessage("Language"),
         "login": MessageLookupByLibrary.simpleMessage("Login"),
+        "lowActivity": MessageLookupByLibrary.simpleMessage("Low Activity"),
+        "mediumActivity":
+            MessageLookupByLibrary.simpleMessage("Medium Activity"),
         "music": MessageLookupByLibrary.simpleMessage("Music"),
         "musicMessage1": MessageLookupByLibrary.simpleMessage(
             "Your favorite artist just released a new album!"),
@@ -136,6 +142,10 @@ class MessageLookup extends MessageLookupByLibrary {
         "noDate": MessageLookupByLibrary.simpleMessage("No date"),
         "noNotifications":
             MessageLookupByLibrary.simpleMessage("No notifications"),
+        "noSignupData":
+            MessageLookupByLibrary.simpleMessage("No signup data available"),
+        "noSignupsInPeriod":
+            MessageLookupByLibrary.simpleMessage("No signups in this period"),
         "noTitle": MessageLookupByLibrary.simpleMessage("No title"),
         "noUsersFound": MessageLookupByLibrary.simpleMessage("No users found"),
         "notificationBody":
@@ -148,6 +158,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Your notification preferences have been updated."),
         "notificationScheduled":
             MessageLookupByLibrary.simpleMessage("Notification scheduled "),
+        "notificationStats":
+            MessageLookupByLibrary.simpleMessage("Notification Statistics"),
         "notificationTitle":
             MessageLookupByLibrary.simpleMessage("Notification Title"),
         "password": MessageLookupByLibrary.simpleMessage("Password"),
@@ -179,6 +191,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Promotional notification sent"),
         "promotionalNotificationTitle":
             MessageLookupByLibrary.simpleMessage("Special Offer!"),
+        "readNotifications":
+            MessageLookupByLibrary.simpleMessage("Read Notifications"),
         "receiveNotifications":
             MessageLookupByLibrary.simpleMessage("Receive Notifications"),
         "receivePromotions":
@@ -218,6 +232,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "sportsMessage3":
             MessageLookupByLibrary.simpleMessage("New sports gear available."),
         "submit": MessageLookupByLibrary.simpleMessage("Submit"),
+        "subtitle1": MessageLookupByLibrary.simpleMessage("Subtitle 1"),
         "technology": MessageLookupByLibrary.simpleMessage("Technology"),
         "technologyMessage1":
             MessageLookupByLibrary.simpleMessage("New tech gadget launched!"),
@@ -225,6 +240,9 @@ class MessageLookup extends MessageLookupByLibrary {
             "Breaking news on AI development!"),
         "technologyMessage3": MessageLookupByLibrary.simpleMessage(
             "Discover the latest in smart home technology."),
+        "totalNotifications":
+            MessageLookupByLibrary.simpleMessage("Total Notifications"),
+        "totalUsers": MessageLookupByLibrary.simpleMessage("Total Users"),
         "travel": MessageLookupByLibrary.simpleMessage("Travel"),
         "travelMessage1": MessageLookupByLibrary.simpleMessage(
             "Dreaming of a getaway? Check out our latest travel deals!"),
@@ -232,6 +250,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Explore new destinations with our travel guide."),
         "travelMessage3": MessageLookupByLibrary.simpleMessage(
             "Last-minute vacation packages available!"),
+        "unreadNotifications":
+            MessageLookupByLibrary.simpleMessage("Unread Notifications"),
         "updateNotificationBody": MessageLookupByLibrary.simpleMessage(
             "We have some exciting new features for you. Update now to explore!"),
         "updateNotificationSent":
@@ -239,10 +259,17 @@ class MessageLookup extends MessageLookupByLibrary {
         "updateNotificationTitle":
             MessageLookupByLibrary.simpleMessage("App Update"),
         "user": MessageLookupByLibrary.simpleMessage("User"),
+        "userActivityLevels":
+            MessageLookupByLibrary.simpleMessage("User Activity Levels"),
         "userDeletedSuccessfully":
             MessageLookupByLibrary.simpleMessage("User deleted successfully"),
+        "userInterests": MessageLookupByLibrary.simpleMessage("User Interests"),
+        "userList": MessageLookupByLibrary.simpleMessage("User List"),
         "userNotLoggedIn": MessageLookupByLibrary.simpleMessage(
             "User not logged in. Cannot send notification."),
+        "userPreferences":
+            MessageLookupByLibrary.simpleMessage("User Preferences"),
+        "userSignups": MessageLookupByLibrary.simpleMessage("User Signups"),
         "viewNotificationHistory":
             MessageLookupByLibrary.simpleMessage("View Notification History"),
         "welcomeBack": MessageLookupByLibrary.simpleMessage("Welcome Back!"),

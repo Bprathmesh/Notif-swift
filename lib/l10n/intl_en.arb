@@ -180,7 +180,28 @@
   "enterAdminPassword": "Enter Admin Password",
   "submit": "Submit",
   "incorrectAdminPassword": "Incorrect admin password",
-  "adminPrivilegesGranted": "Admin privileges granted"
+  "adminPrivilegesGranted": "Admin privileges granted",
+
+  "analytics": "Analytics",
+  "totalUsers": "Total Users",
+  "activeUsers": "Active Users",
+  "userInterests": "User Interests",
+  "userSignups": "User Signups",
+  "subtitle1":"Subtitle 1",
+  "userList": "User List",
+  "noSignupData": "No signup data available",
+
+  "notificationStats": "Notification Statistics",
+  "totalNotifications": "Total Notifications",
+  "readNotifications": "Read Notifications",
+  "unreadNotifications": "Unread Notifications",
+  "userActivityLevels": "User Activity Levels",
+  "highActivity": "High Activity",
+  "mediumActivity": "Medium Activity",
+  "lowActivity": "Low Activity",
+  "userPreferences": "User Preferences",
+  "noSignupsInPeriod": "No signups in this period"
+
   
 
   

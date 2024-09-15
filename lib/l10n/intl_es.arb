@@ -180,5 +180,24 @@
   "enterAdminPassword": "Ingrese la Contraseña de Administrador",
   "submit": "Enviar",
   "incorrectAdminPassword": "Contraseña de administrador incorrecta",
-  "adminPrivilegesGranted": "Se han otorgado los privilegios de administrador"
+  "adminPrivilegesGranted": "Se han otorgado los privilegios de administrador",
+  "analytics": "Analíticas",
+  "totalUsers": "Usuarios Totales",
+  "activeUsers": "Usuarios Activos",
+  "userInterests": "Intereses de Usuarios",
+  "userSignups": "Registros de Usuarios",
+  "subtitle1": "Subtítulo 1",
+  "userList": "Lista de Usuarios",
+   "noSignupData": "No hay datos de registro disponibles",
+
+   "notificationStats": "Estadísticas de Notificaciones",
+  "totalNotifications": "Notificaciones Totales",
+  "readNotifications": "Notificaciones Leídas",
+  "unreadNotifications": "Notificaciones No Leídas",
+  "userActivityLevels": "Niveles de Actividad del Usuario",
+  "highActivity": "Actividad Alta",
+  "mediumActivity": "Actividad Media",
+  "lowActivity": "Actividad Baja",
+  "userPreferences": "Preferencias del Usuario",
+  "noSignupsInPeriod": "No hay registros de registro en este período"
 }

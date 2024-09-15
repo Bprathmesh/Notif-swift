@@ -1289,6 +1289,186 @@ class S {
       args: [],
     );
   }
+
+  /// `Analytics`
+  String get analytics {
+    return Intl.message(
+      'Analytics',
+      name: 'analytics',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Total Users`
+  String get totalUsers {
+    return Intl.message(
+      'Total Users',
+      name: 'totalUsers',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Active Users`
+  String get activeUsers {
+    return Intl.message(
+      'Active Users',
+      name: 'activeUsers',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User Interests`
+  String get userInterests {
+    return Intl.message(
+      'User Interests',
+      name: 'userInterests',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User Signups`
+  String get userSignups {
+    return Intl.message(
+      'User Signups',
+      name: 'userSignups',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Subtitle 1`
+  String get subtitle1 {
+    return Intl.message(
+      'Subtitle 1',
+      name: 'subtitle1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User List`
+  String get userList {
+    return Intl.message(
+      'User List',
+      name: 'userList',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No signup data available`
+  String get noSignupData {
+    return Intl.message(
+      'No signup data available',
+      name: 'noSignupData',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notification Statistics`
+  String get notificationStats {
+    return Intl.message(
+      'Notification Statistics',
+      name: 'notificationStats',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Total Notifications`
+  String get totalNotifications {
+    return Intl.message(
+      'Total Notifications',
+      name: 'totalNotifications',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Read Notifications`
+  String get readNotifications {
+    return Intl.message(
+      'Read Notifications',
+      name: 'readNotifications',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unread Notifications`
+  String get unreadNotifications {
+    return Intl.message(
+      'Unread Notifications',
+      name: 'unreadNotifications',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User Activity Levels`
+  String get userActivityLevels {
+    return Intl.message(
+      'User Activity Levels',
+      name: 'userActivityLevels',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `High Activity`
+  String get highActivity {
+    return Intl.message(
+      'High Activity',
+      name: 'highActivity',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Medium Activity`
+  String get mediumActivity {
+    return Intl.message(
+      'Medium Activity',
+      name: 'mediumActivity',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Low Activity`
+  String get lowActivity {
+    return Intl.message(
+      'Low Activity',
+      name: 'lowActivity',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User Preferences`
+  String get userPreferences {
+    return Intl.message(
+      'User Preferences',
+      name: 'userPreferences',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No signups in this period`
+  String get noSignupsInPeriod {
+    return Intl.message(
+      'No signups in this period',
+      name: 'noSignupsInPeriod',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
