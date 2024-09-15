@@ -14,9 +14,19 @@ import 'phoenix.dart';
 import 'package:provider/provider.dart';
 import 'package:mypushnotifications/providers/theme_provider.dart';
 import 'package:mypushnotifications/providers/language_provider.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'firebase_options.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  
+  // Use this for web support
+  setUrlStrategy(PathUrlStrategy());
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
   await NotificationService().init();
 
   runApp(
@@ -54,14 +64,14 @@ class MyApp extends StatelessWidget {
           locale: languageProvider.currentLocale,
           initialRoute: '/',
           routes: {
-        '/': (context) => const Wrapper(),
-        '/home': (context) => const HomePage(),
-        '/sign_in': (context) => const SignInPage(),
-        '/register': (context) => const RegisterPage(),
-        '/notification_history': (context) => const NotificationHistoryPage(),
-        '/preferences': (context) => const PreferencesPage(),
-        '/admin': (context) => const AdminPage()
-      },
+            '/': (context) => const Wrapper(),
+            '/home': (context) => const HomePage(),
+            '/sign_in': (context) => const SignInPage(),
+            '/register': (context) => const RegisterPage(),
+            '/notification_history': (context) => const NotificationHistoryPage(),
+            '/preferences': (context) => const PreferencesPage(),
+            '/admin': (context) => const AdminPage()
+          },
         );
       },
     );

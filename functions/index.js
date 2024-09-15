@@ -2,21 +2,30 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-exports.sendTestNotification = functions.https.onRequest(async (req, res) => {
+exports.sendNotificationToUser = functions.https.onCall(async (data, context) => {
+  const { userId, title, body } = data;
+  
   try {
+    const user = await admin.firestore().collection('users').doc(userId).get();
+    const fcmToken = user.data().fcmToken;
+
+    if (!fcmToken) {
+      throw new functions.https.HttpsError('not-found', 'FCM token not found for user');
+    }
+
     const message = {
       notification: {
-        title: 'Test Notification',
-        body: 'This is a test notification from Firebase Cloud Functions!',
+        title: title,
+        body: body,
       },
-      topic: 'test_notifications',
+      token: fcmToken,
     };
 
     const response = await admin.messaging().send(message);
     console.log('Successfully sent message:', response);
-    res.json({success: true, message: 'Notification sent successfully'});
+    return { success: true };
   } catch (error) {
-    console.log('Error sending message:', error);
-    res.status(500).send(error);
+    console.error('Error sending message:', error);
+    throw new functions.https.HttpsError('internal', 'Error sending notification');
   }
 });

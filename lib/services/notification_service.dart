@@ -8,6 +8,7 @@ import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mypushnotifications/generated/l10n.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -40,29 +41,50 @@ class NotificationService {
     try {
       await Firebase.initializeApp();
       
-      await _fcm.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+      if (!kIsWeb) {
+        await _fcm.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
 
-      const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-      const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true,
-      );
-      final InitializationSettings initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid,
-        iOS: initializationSettingsIOS,
-      );
+        const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+        const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
+        final InitializationSettings initializationSettings = InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS,
+        );
 
-      await _flutterLocalNotificationsPlugin.initialize(
-        initializationSettings,
-        onDidReceiveNotificationResponse: (NotificationResponse response) {
-          _handleNotificationResponse(response);
-        },
-      );
+        await _flutterLocalNotificationsPlugin.initialize(
+          initializationSettings,
+          onDidReceiveNotificationResponse: (NotificationResponse response) {
+            _handleNotificationResponse(response);
+          },
+        );
+
+        await _createNotificationChannels();
+
+        // Initialize timezone
+        tz_data.initializeTimeZones();
+        tz.setLocalLocation(tz.getLocation('America/New_York'));
+      } else {
+        // Web-specific initialization
+        NotificationSettings settings = await _fcm.requestPermission(
+          alert: true,
+          announcement: false,
+          badge: true,
+          carPlay: false,
+          criticalAlert: false,
+          provisional: false,
+          sound: true,
+        );
+        
+        print('User granted permission: ${settings.authorizationStatus}');
+      }
 
       FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
       FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageOpenedApp);
@@ -75,47 +97,106 @@ class NotificationService {
 
       _fcm.onTokenRefresh.listen(_saveTokenToFirestore);
 
-      await _createNotificationChannels();
-
-      // Initialize timezone
-      tz_data.initializeTimeZones();
-      tz.setLocalLocation(tz.getLocation('America/New_York')); // Use a default timezone or get it from the device
-
       _isInitialized = true;
     } catch (e) {
       print('Error initializing NotificationService: $e');
     }
   }
+  Future<void> toggleNotifications(bool value, String userId) async {
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'receiveNotifications': value,
+      });
+
+      if (!kIsWeb) {
+        // Mobile-specific topic subscription
+        if (value) {
+          await FirebaseMessaging.instance.subscribeToTopic('test_notifications');
+        } else {
+          await FirebaseMessaging.instance.unsubscribeFromTopic('test_notifications');
+        }
+      } else {
+        // Web-specific handling
+        await _updateWebNotificationPreferences(userId, value);
+      }
+    } catch (e) {
+      print('Error updating notification settings: $e');
+      rethrow;
+    }
+  }
+    Future<void> _updateWebNotificationPreferences(String userId, bool receiveNotifications) async {
+    try {
+      // Update user preferences in Firestore
+      await _firestore.collection('users').doc(userId).update({
+        'receiveNotifications': receiveNotifications,
+      });
+
+      // You might want to implement additional logic here for web notifications
+      // For example, you could store a flag in local storage or update your backend
+      // to know whether to send notifications to this web client
+      
+      print('Web notification preferences updated successfully');
+    } catch (e) {
+      print('Error updating web notification preferences: $e');
+      rethrow;
+    }
+  }
+  Future<void> sendNotificationToTopic(String topic, String title, String body) async {
+    if (kIsWeb) {
+      print('Sending notifications to topics is not directly supported on web.');
+      // You might want to implement a custom solution here, such as:
+      // - Calling a Cloud Function that sends the notification
+      // - Updating a Firestore document that triggers a Cloud Function
+    } else {
+      // This part remains the same for mobile platforms
+      try {
+        await FirebaseMessaging.instance.sendMessage(
+          to: '/topics/$topic',
+          data: {
+            'title': title,
+            'body': body,
+          },
+        );
+        print('Notification sent to topic: $topic');
+      } catch (e) {
+        print('Error sending notification to topic: $e');
+        rethrow;
+      }
+    }
+  }
+
   Future<void> _createNotificationChannels() async {
-    const AndroidNotificationChannel defaultChannel = AndroidNotificationChannel(
-      _defaultChannelId,
-      _defaultChannelName,
-      importance: Importance.high,
-    );
+    if (!kIsWeb) {
+      const AndroidNotificationChannel defaultChannel = AndroidNotificationChannel(
+        _defaultChannelId,
+        _defaultChannelName,
+        importance: Importance.high,
+      );
 
-    const AndroidNotificationChannel personalizedChannel = AndroidNotificationChannel(
-      _personalizedChannelId,
-      _personalizedChannelName,
-      importance: Importance.high,
-    );
+      const AndroidNotificationChannel personalizedChannel = AndroidNotificationChannel(
+        _personalizedChannelId,
+        _personalizedChannelName,
+        importance: Importance.high,
+      );
 
-    const AndroidNotificationChannel scheduledChannel = AndroidNotificationChannel(
-      _scheduledChannelId,
-      _scheduledChannelName,
-      importance: Importance.high,
-    );
+      const AndroidNotificationChannel scheduledChannel = AndroidNotificationChannel(
+        _scheduledChannelId,
+        _scheduledChannelName,
+        importance: Importance.high,
+      );
 
-    await _flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(defaultChannel);
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(defaultChannel);
 
-    await _flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(personalizedChannel);
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(personalizedChannel);
 
-    await _flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(scheduledChannel);
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(scheduledChannel);
+    }
   }
 
   void _handleForegroundMessage(RemoteMessage message) {
@@ -139,20 +220,22 @@ class NotificationService {
   }
 
   Future<void> _showLocalNotification(String title, String body) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      _defaultChannelId,
-      _defaultChannelName,
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    if (!kIsWeb) {
+      const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        _defaultChannelId,
+        _defaultChannelName,
+        importance: Importance.max,
+        priority: Priority.high,
+      );
+      const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
 
-    await _flutterLocalNotificationsPlugin.show(
-      0, // Notification ID
-      title,
-      body,
-      platformChannelSpecifics,
-    );
+      await _flutterLocalNotificationsPlugin.show(
+        0, // Notification ID
+        title,
+        body,
+        platformChannelSpecifics,
+      );
+    }
 
     await _saveNotificationToFirestore(title, body);
   }
@@ -323,32 +406,35 @@ class NotificationService {
       print('Error sending update notification: $e');
     }
   }
+
   Future<void> scheduleNotification(String userId, DateTime scheduledTime, String title, String body) async {
     try {
-      final int notificationId = DateTime.now().millisecondsSinceEpoch.remainder(100000);
+      if (!kIsWeb) {
+        final int notificationId = DateTime.now().millisecondsSinceEpoch.remainder(100000);
 
-      await _flutterLocalNotificationsPlugin.zonedSchedule(
-        notificationId,
-        title,
-        body,
-        tz.TZDateTime.from(scheduledTime, tz.local),
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            _scheduledChannelId,
-            _scheduledChannelName,
-            importance: Importance.max,
-            priority: Priority.high,
+        await _flutterLocalNotificationsPlugin.zonedSchedule(
+          notificationId,
+          title,
+          body,
+          tz.TZDateTime.from(scheduledTime, tz.local),
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              _scheduledChannelId,
+              _scheduledChannelName,
+              importance: Importance.max,
+              priority: Priority.high,
+            ),
           ),
-        ),
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time,
-        payload: '$userId|$title|$body', // Add this line
-      );
+          androidAllowWhileIdle: true,
+          uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+          matchDateTimeComponents: DateTimeComponents.time,
+          payload: '$userId|$title|$body',
+        );
+      }
 
       // Store the scheduled notification info in Firestore
       await _firestore.collection('users').doc(userId).collection('scheduled_notifications').add({
-        'notificationId': notificationId,
+        'notificationId': DateTime.now().millisecondsSinceEpoch.remainder(100000),
         'title': title,
         'body': body,
         'scheduledTime': scheduledTime,
@@ -405,11 +491,19 @@ class NotificationService {
   }
 
   Future<void> cancelNotification(int id) async {
-    await _flutterLocalNotificationsPlugin.cancel(id);
+    if (!kIsWeb) {
+      await _flutterLocalNotificationsPlugin.cancel(id);
+    }
+    // For web, you might want to implement a different cancellation logic
+    // using Firestore to mark the notification as cancelled
   }
 
   Future<void> cancelAllNotifications() async {
-    await _flutterLocalNotificationsPlugin.cancelAll();
+    if (!kIsWeb) {
+      await _flutterLocalNotificationsPlugin.cancelAll();
+    }
+    // For web, you might want to implement a different cancellation logic
+    // using Firestore to mark all notifications as cancelled
   }
 
   Future<void> deleteNotification(String notificationId, String type) async {
@@ -429,7 +523,7 @@ class NotificationService {
           .doc(notificationId)
           .delete();
 
-      if (type == 'scheduled') {
+      if (type == 'scheduled' && !kIsWeb) {
         // Cancel the scheduled notification
         DocumentSnapshot notificationDoc = await _firestore
             .collection('users')
@@ -450,6 +544,26 @@ class NotificationService {
     } catch (e) {
       print('Error deleting notification: $e');
       rethrow;
+    }
+  }
+
+  // You might want to add more methods here for web-specific functionality
+  // For example, a method to display notifications on web using browser APIs
+
+  Future<void> displayWebNotification(String title, String body) async {
+    if (kIsWeb) {
+      // This is a basic example and might need adjustments based on your web setup
+      try {
+        await _fcm.requestPermission();
+        await FirebaseMessaging.instance.sendMessage(
+          data: {
+            'title': title,
+            'body': body,
+          },
+        );
+      } catch (e) {
+        print('Error displaying web notification: $e');
+      }
     }
   }
 }
