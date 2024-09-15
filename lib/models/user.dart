@@ -12,6 +12,7 @@ class User {
   final DateTime lastLogin;
   final DateTime createdAt;
   final String preferredLanguage;
+  final bool isAdmin;
 
   User({
     required this.id,
@@ -25,26 +26,28 @@ class User {
     required this.lastLogin,
     required this.createdAt,
     required this.preferredLanguage,
+    required this.isAdmin,
   });
 
   factory User.fromMap(Map<String, dynamic> map, String id) {
-  return User(
-    id: id,
-    name: map['name'] as String? ?? '',
-    email: map['email'] as String? ?? '',
-    receivePromotions: map['receivePromotions'] as bool? ?? false,
-    receiveUpdates: map['receiveUpdates'] as bool? ?? false,
-    receiveNotifications: map['receiveNotifications'] as bool? ?? false,
-    fcmToken: map['fcmToken'] as String? ?? '',
-    interests: List<String>.from(map['interests'] ?? []),
-    lastLogin: (map['lastLogin'] as Timestamp?)?.toDate() ?? DateTime.now(),
-    createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-    preferredLanguage: map['preferredLanguage'] as String? ?? 'en',
-  );
-}
+    return User(
+      id: id,
+      name: map['name'] as String? ?? '',
+      email: map['email'] as String? ?? '',
+      receivePromotions: map['receivePromotions'] as bool? ?? false,
+      receiveUpdates: map['receiveUpdates'] as bool? ?? false,
+      receiveNotifications: map['receiveNotifications'] as bool? ?? false,
+      fcmToken: map['fcmToken'] as String? ?? '',
+      interests: List<String>.from(map['interests'] ?? []),
+      lastLogin: (map['lastLogin'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      preferredLanguage: map['preferredLanguage'] as String? ?? 'en',
+      isAdmin: map['isAdmin'] as bool? ?? false,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'name': name,
       'email': email,
       'receivePromotions': receivePromotions,
@@ -54,7 +57,8 @@ class User {
       'interests': interests,
       'lastLogin': Timestamp.fromDate(lastLogin),
       'createdAt': Timestamp.fromDate(createdAt),
-      'preferredLanguage': preferredLanguage, // New field
+      'preferredLanguage': preferredLanguage,
+      'isAdmin': isAdmin,
     };
   }
 
@@ -66,20 +70,22 @@ class User {
     String? fcmToken,
     List<String>? interests,
     DateTime? lastLogin,
-    String? preferredLanguage, // New field
+    String? preferredLanguage,
+    bool? isAdmin,
   }) {
     return User(
-      id: id,
+      id: this.id,
       name: name ?? this.name,
-      email: email,
+      email: this.email,
       receivePromotions: receivePromotions ?? this.receivePromotions,
       receiveUpdates: receiveUpdates ?? this.receiveUpdates,
       receiveNotifications: receiveNotifications ?? this.receiveNotifications,
       fcmToken: fcmToken ?? this.fcmToken,
       interests: interests ?? this.interests,
       lastLogin: lastLogin ?? this.lastLogin,
-      createdAt: createdAt,
-      preferredLanguage: preferredLanguage ?? this.preferredLanguage, // New field
+      createdAt: this.createdAt,
+      preferredLanguage: preferredLanguage ?? this.preferredLanguage,
+      isAdmin: isAdmin ?? this.isAdmin,
     );
   }
 }

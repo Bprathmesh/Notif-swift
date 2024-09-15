@@ -20,7 +20,7 @@
   "errorSendingPromotionalNotification": "Error sending promotional notification. Please try again.",
   "updateNotificationSent": "Update notification sent",
   "errorSendingUpdateNotification": "Error sending update notification. Please try again.",
-  "notificationScheduled": "Notification scheduled for 1 minute from now",
+  "notificationScheduled": "Notification scheduled ",
   "errorSchedulingNotification": "Error scheduling notification. Please try again.",
   "changeLanguage": "Change Language",
   "changeTheme": "Change Theme",
@@ -142,7 +142,45 @@
   "adminPanel": "Admin Panel",
   "errorLoadingUsers": "Error loading users: {error}",
   "userDeletedSuccessfully": "User deleted successfully",
-  "errorDeletingUser": "Error deleting user"
+  "errorDeletingUser": "Error deleting user",
+  "adminPanel": "Admin Panel",
+  "changeTheme": "Change Theme",
+  "noAdminPrivileges": "No admin privileges",
+  "noUsersFound": "No users found",
+  "interests": "Interests",
+  "admin": "Admin",
+  "yes": "Yes",
+  "no": "No",
+  "errorLoadingUser": "Error loading user",
+  "confirmDeletion": "Confirm Deletion",
+  "areYouSureDeleteUser": "Are you sure you want to delete the user {name}?",
+  "@areYouSureDeleteUser": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "adminPrivilegesRequired": "Admin privileges are required for this action.",
+  "userDeletedSuccessfully": "User deleted successfully",
+  "errorDeletingUser": "Error deleting user: {error}",
+  "@errorDeletingUser": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "adminStatusUpdated": "Admin status updated successfully",
+  "errorUpdatingAdminStatus": "Error updating admin status: {error}",
+  "@errorUpdatingAdminStatus": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "becomeAdmin": "Become Admin",
+  "enterAdminPassword": "Enter Admin Password",
+  "submit": "Submit",
+  "incorrectAdminPassword": "Incorrect admin password",
+  "adminPrivilegesGranted": "Admin privileges granted"
   
 
   

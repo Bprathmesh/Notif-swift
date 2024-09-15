@@ -250,10 +250,10 @@ class S {
     );
   }
 
-  /// `Notification scheduled for 1 minute from now`
+  /// `Notification scheduled `
   String get notificationScheduled {
     return Intl.message(
-      'Notification scheduled for 1 minute from now',
+      'Notification scheduled ',
       name: 'notificationScheduled',
       desc: '',
       args: [],
@@ -1100,11 +1100,191 @@ class S {
     );
   }
 
-  /// `Error deleting user`
-  String get errorDeletingUser {
+  /// `Error deleting user: {error}`
+  String errorDeletingUser(Object error) {
     return Intl.message(
-      'Error deleting user',
+      'Error deleting user: $error',
       name: 'errorDeletingUser',
+      desc: '',
+      args: [error],
+    );
+  }
+
+  /// `No admin privileges`
+  String get noAdminPrivileges {
+    return Intl.message(
+      'No admin privileges',
+      name: 'noAdminPrivileges',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No users found`
+  String get noUsersFound {
+    return Intl.message(
+      'No users found',
+      name: 'noUsersFound',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Admin`
+  String get admin {
+    return Intl.message(
+      'Admin',
+      name: 'admin',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Yes`
+  String get yes {
+    return Intl.message(
+      'Yes',
+      name: 'yes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No`
+  String get no {
+    return Intl.message(
+      'No',
+      name: 'no',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Error loading user`
+  String get errorLoadingUser {
+    return Intl.message(
+      'Error loading user',
+      name: 'errorLoadingUser',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Confirm Deletion`
+  String get confirmDeletion {
+    return Intl.message(
+      'Confirm Deletion',
+      name: 'confirmDeletion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to delete the user {name}?`
+  String areYouSureDeleteUser(Object name) {
+    return Intl.message(
+      'Are you sure you want to delete the user $name?',
+      name: 'areYouSureDeleteUser',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Cancel`
+  String get cancel {
+    return Intl.message(
+      'Cancel',
+      name: 'cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete`
+  String get delete {
+    return Intl.message(
+      'Delete',
+      name: 'delete',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Admin privileges are required for this action.`
+  String get adminPrivilegesRequired {
+    return Intl.message(
+      'Admin privileges are required for this action.',
+      name: 'adminPrivilegesRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Admin status updated successfully`
+  String get adminStatusUpdated {
+    return Intl.message(
+      'Admin status updated successfully',
+      name: 'adminStatusUpdated',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Error updating admin status: {error}`
+  String errorUpdatingAdminStatus(Object error) {
+    return Intl.message(
+      'Error updating admin status: $error',
+      name: 'errorUpdatingAdminStatus',
+      desc: '',
+      args: [error],
+    );
+  }
+
+  /// `Become Admin`
+  String get becomeAdmin {
+    return Intl.message(
+      'Become Admin',
+      name: 'becomeAdmin',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter Admin Password`
+  String get enterAdminPassword {
+    return Intl.message(
+      'Enter Admin Password',
+      name: 'enterAdminPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Submit`
+  String get submit {
+    return Intl.message(
+      'Submit',
+      name: 'submit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Incorrect admin password`
+  String get incorrectAdminPassword {
+    return Intl.message(
+      'Incorrect admin password',
+      name: 'incorrectAdminPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Admin privileges granted`
+  String get adminPrivilegesGranted {
+    return Intl.message(
+      'Admin privileges granted',
+      name: 'adminPrivilegesGranted',
       desc: '',
       args: [],
     );

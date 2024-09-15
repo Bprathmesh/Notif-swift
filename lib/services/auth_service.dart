@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import the User type here
 
 class AuthService {
@@ -32,28 +33,59 @@ class AuthService {
       return null;
     }
   }
-  Future<void> deleteUser(String userId) async {
+  Future<bool> isUserAdmin(String userId) async {
     try {
-      // Get an instance of FirebaseAuth
-      FirebaseAuth auth = FirebaseAuth.instance;
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+        return userData['isAdmin'] ?? false;
+      }
+      return false;
+    } catch (e) {
+      print('Error checking admin status: $e');
+      return false;
+    }
+  }
+  Future<void> updateAdminStatus(String userId, bool isAdmin) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'isAdmin': isAdmin});
+    } catch (e) {
+      print('Error updating admin status: $e');
+      throw Exception('Failed to update admin status');
+    }
+  }
+ Future<void> deleteUser(String userId) async {
+    try {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        throw Exception('No user is currently logged in');
+      }
 
-      // Get the current user
-      User? currentUser = auth.currentUser;
+      bool isAdmin = await isUserAdmin(currentUser.uid);
+      if (!isAdmin && currentUser.uid != userId) {
+        throw Exception('Only admins can delete other users');
+      }
 
-      if (currentUser != null && currentUser.uid == userId) {
-        // If the user to be deleted is the current user, delete them directly
+      // Delete user from Firebase Authentication
+      if (currentUser.uid == userId) {
         await currentUser.delete();
       } else {
-        // If it's a different user, you'll need admin SDK or Cloud Functions
-        // This is just a placeholder - implement your server-side logic here
-        throw Exception('Deleting other users requires admin privileges');
+        // For deleting other users, you'll need to use Firebase Admin SDK on the server side
+        // Here, we'll just delete the user document from Firestore
+        await FirebaseFirestore.instance.collection('users').doc(userId).delete();
       }
+
+      // Delete user document from Firestore
+      await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+
     } catch (e) {
       print('Error deleting user: $e');
       rethrow;
     }
   }
-
   // Method to sign out the current user
   Future<void> signOut() async {
     try {

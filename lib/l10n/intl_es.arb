@@ -142,5 +142,43 @@
   "errorLoadingUsers": "Error al cargar los usuarios: {error}",
   "userDeletedSuccessfully": "Usuario eliminado exitosamente",
   "errorDeletingUser": "Error al eliminar el usuario",
-   "errorDeletingUser": "Error al eliminar el usuario"
+   "errorDeletingUser": "Error al eliminar el usuario",
+   "adminPanel": "Panel de Administración",
+  "changeTheme": "Cambiar Tema",
+  "noAdminPrivileges": "No tienes privilegios de administrador.",
+  "noUsersFound": "No se encontraron usuarios",
+  "interests": "Intereses",
+  "admin": "Administrador",
+  "yes": "Sí",
+  "no": "No",
+  "errorLoadingUser": "Error al cargar el usuario",
+  "confirmDeletion": "Confirmar Eliminación",
+  "areYouSureDeleteUser": "¿Estás seguro de que quieres eliminar al usuario {name}?",
+  "@areYouSureDeleteUser": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "cancel": "Cancelar",
+  "delete": "Eliminar",
+  "adminPrivilegesRequired": "Se requieren privilegios de administrador para esta acción.",
+  "userDeletedSuccessfully": "Usuario eliminado con éxito",
+  "errorDeletingUser": "Error al eliminar usuario: {error}",
+  "@errorDeletingUser": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "adminStatusUpdated": "Estado de administrador actualizado con éxito",
+  "errorUpdatingAdminStatus": "Error al actualizar el estado de administrador: {error}",
+  "@errorUpdatingAdminStatus": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "becomeAdmin": "Convertirse en Administrador",
+  "enterAdminPassword": "Ingrese la Contraseña de Administrador",
+  "submit": "Enviar",
+  "incorrectAdminPassword": "Contraseña de administrador incorrecta",
+  "adminPrivilegesGranted": "Se han otorgado los privilegios de administrador"
 }

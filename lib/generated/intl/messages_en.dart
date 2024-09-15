@@ -20,46 +20,68 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
-  static String m0(string) => "Error: ${string}";
+  static String m0(name) => "Are you sure you want to delete the user ${name}?";
 
-  static String m1(error) => "Error loading users: ${error}";
+  static String m1(string) => "Error: ${string}";
 
-  static String m2(error) => "Failed to save preferences: ${error}";
+  static String m2(error) => "Error deleting user: ${error}";
 
-  static String m3(name) => "Hello ${name}";
+  static String m3(error) => "Error loading users: ${error}";
 
-  static String m4(interest) => "${interest}";
+  static String m4(error) => "Error updating admin status: ${error}";
 
-  static String m5(name) => "${name}, check out our latest promotion!";
+  static String m5(error) => "Failed to save preferences: ${error}";
 
-  static String m6(error) => "Registration failed: ${error}";
+  static String m6(name) => "Hello ${name}";
 
-  static String m7(format) => "Scheduled for: ${format}";
+  static String m7(interest) => "${interest}";
 
-  static String m8(format) => "Sent: ${format}";
+  static String m8(name) => "${name}, check out our latest promotion!";
+
+  static String m9(error) => "Registration failed: ${error}";
+
+  static String m10(format) => "Scheduled for: ${format}";
+
+  static String m11(format) => "Sent: ${format}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "admin": MessageLookupByLibrary.simpleMessage("Admin"),
         "adminLogin": MessageLookupByLibrary.simpleMessage("Admin Login"),
         "adminPanel": MessageLookupByLibrary.simpleMessage("Admin Panel"),
         "adminPassword": MessageLookupByLibrary.simpleMessage("Admin Password"),
+        "adminPrivilegesGranted":
+            MessageLookupByLibrary.simpleMessage("Admin privileges granted"),
+        "adminPrivilegesRequired": MessageLookupByLibrary.simpleMessage(
+            "Admin privileges are required for this action."),
+        "adminStatusUpdated": MessageLookupByLibrary.simpleMessage(
+            "Admin status updated successfully"),
+        "areYouSureDeleteUser": m0,
+        "becomeAdmin": MessageLookupByLibrary.simpleMessage("Become Admin"),
+        "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
         "changeLanguage":
             MessageLookupByLibrary.simpleMessage("Change Language"),
         "changeTheme": MessageLookupByLibrary.simpleMessage("Change Theme"),
+        "confirmDeletion":
+            MessageLookupByLibrary.simpleMessage("Confirm Deletion"),
         "createAccount":
             MessageLookupByLibrary.simpleMessage("Create an account"),
         "defaultMessage": MessageLookupByLibrary.simpleMessage(
             "We have exciting news for you!"),
+        "delete": MessageLookupByLibrary.simpleMessage("Delete"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),
         "english": MessageLookupByLibrary.simpleMessage("English"),
-        "error": m0,
-        "errorDeletingUser":
-            MessageLookupByLibrary.simpleMessage("Error deleting user"),
+        "enterAdminPassword":
+            MessageLookupByLibrary.simpleMessage("Enter Admin Password"),
+        "error": m1,
+        "errorDeletingUser": m2,
         "errorFetchingNotifications": MessageLookupByLibrary.simpleMessage(
             "Error fetching notifications. Please try again."),
         "errorInitializingNotifications": MessageLookupByLibrary.simpleMessage(
             "Error initializing notifications. Please try again later."),
-        "errorLoadingUsers": m1,
+        "errorLoadingUser":
+            MessageLookupByLibrary.simpleMessage("Error loading user"),
+        "errorLoadingUsers": m3,
         "errorSchedulingNotification": MessageLookupByLibrary.simpleMessage(
             "Error scheduling notification. Please try again."),
         "errorSendingPersonalizedNotification":
@@ -72,12 +94,13 @@ class MessageLookup extends MessageLookupByLibrary {
             "Error sending update notification. Please try again."),
         "errorSigningOut": MessageLookupByLibrary.simpleMessage(
             "Error signing out. Please try again."),
+        "errorUpdatingAdminStatus": m4,
         "errorUpdatingNotificationSettings":
             MessageLookupByLibrary.simpleMessage(
                 "Error updating notification settings. Please try again."),
         "failedToDeleteNotification": MessageLookupByLibrary.simpleMessage(
             "Failed to delete notification"),
-        "failedToSavePreferences": m2,
+        "failedToSavePreferences": m5,
         "fashion": MessageLookupByLibrary.simpleMessage("Fashion"),
         "finance": MessageLookupByLibrary.simpleMessage("Finance"),
         "food": MessageLookupByLibrary.simpleMessage("Food"),
@@ -88,9 +111,11 @@ class MessageLookup extends MessageLookupByLibrary {
         "foodMessage3": MessageLookupByLibrary.simpleMessage(
             "New cooking tutorial: Learn to make gourmet dishes at home."),
         "health": MessageLookupByLibrary.simpleMessage("Health"),
-        "hello": m3,
+        "hello": m6,
         "homePage": MessageLookupByLibrary.simpleMessage("Home Page"),
-        "interest": m4,
+        "incorrectAdminPassword":
+            MessageLookupByLibrary.simpleMessage("Incorrect admin password"),
+        "interest": m7,
         "interests": MessageLookupByLibrary.simpleMessage("Interests"),
         "invalidAdminPassword":
             MessageLookupByLibrary.simpleMessage("Invalid admin password"),
@@ -104,11 +129,15 @@ class MessageLookup extends MessageLookupByLibrary {
         "musicMessage3": MessageLookupByLibrary.simpleMessage(
             "Discover this week’s top hits."),
         "name": MessageLookupByLibrary.simpleMessage("Name"),
+        "no": MessageLookupByLibrary.simpleMessage("No"),
+        "noAdminPrivileges":
+            MessageLookupByLibrary.simpleMessage("No admin privileges"),
         "noBody": MessageLookupByLibrary.simpleMessage("No body"),
         "noDate": MessageLookupByLibrary.simpleMessage("No date"),
         "noNotifications":
             MessageLookupByLibrary.simpleMessage("No notifications"),
         "noTitle": MessageLookupByLibrary.simpleMessage("No title"),
+        "noUsersFound": MessageLookupByLibrary.simpleMessage("No users found"),
         "notificationBody":
             MessageLookupByLibrary.simpleMessage("Notification Body"),
         "notificationDeleted":
@@ -117,8 +146,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Notification History"),
         "notificationPreferencesUpdated": MessageLookupByLibrary.simpleMessage(
             "Your notification preferences have been updated."),
-        "notificationScheduled": MessageLookupByLibrary.simpleMessage(
-            "Notification scheduled for 1 minute from now"),
+        "notificationScheduled":
+            MessageLookupByLibrary.simpleMessage("Notification scheduled "),
         "notificationTitle":
             MessageLookupByLibrary.simpleMessage("Notification Title"),
         "password": MessageLookupByLibrary.simpleMessage("Password"),
@@ -145,7 +174,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Preferences saved successfully"),
         "preferencesUpdated":
             MessageLookupByLibrary.simpleMessage("Preferences Updated"),
-        "promotionalNotificationBody": m5,
+        "promotionalNotificationBody": m8,
         "promotionalNotificationSent": MessageLookupByLibrary.simpleMessage(
             "Promotional notification sent"),
         "promotionalNotificationTitle":
@@ -157,14 +186,14 @@ class MessageLookup extends MessageLookupByLibrary {
         "receiveUpdates":
             MessageLookupByLibrary.simpleMessage("Receive Updates"),
         "register": MessageLookupByLibrary.simpleMessage("Register"),
-        "registrationFailed": m6,
+        "registrationFailed": m9,
         "savePreferences":
             MessageLookupByLibrary.simpleMessage("Save Preferences"),
         "scheduleNewNotification":
             MessageLookupByLibrary.simpleMessage("Schedule New Notification"),
         "scheduleNotification":
             MessageLookupByLibrary.simpleMessage("Schedule Notification"),
-        "scheduledFor": m7,
+        "scheduledFor": m10,
         "scheduledNotificationBody": MessageLookupByLibrary.simpleMessage(
             "This is a test scheduled notification"),
         "scheduledNotificationTitle":
@@ -178,7 +207,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Send Test Notifications"),
         "sendUpdateNotification":
             MessageLookupByLibrary.simpleMessage("Send Update Notification"),
-        "sent": m8,
+        "sent": m11,
         "signIn": MessageLookupByLibrary.simpleMessage("Sign In"),
         "spanish": MessageLookupByLibrary.simpleMessage("Spanish"),
         "sports": MessageLookupByLibrary.simpleMessage("Sports"),
@@ -188,6 +217,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Your favorite team has an upcoming match!"),
         "sportsMessage3":
             MessageLookupByLibrary.simpleMessage("New sports gear available."),
+        "submit": MessageLookupByLibrary.simpleMessage("Submit"),
         "technology": MessageLookupByLibrary.simpleMessage("Technology"),
         "technologyMessage1":
             MessageLookupByLibrary.simpleMessage("New tech gadget launched!"),
@@ -215,6 +245,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "User not logged in. Cannot send notification."),
         "viewNotificationHistory":
             MessageLookupByLibrary.simpleMessage("View Notification History"),
-        "welcomeBack": MessageLookupByLibrary.simpleMessage("Welcome Back!")
+        "welcomeBack": MessageLookupByLibrary.simpleMessage("Welcome Back!"),
+        "yes": MessageLookupByLibrary.simpleMessage("Yes")
       };
 }

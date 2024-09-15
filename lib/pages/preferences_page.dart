@@ -56,7 +56,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
       interests: [],
       lastLogin: DateTime.now(),
       createdAt: DateTime.now(),
-      preferredLanguage: 'en',
+      preferredLanguage: 'en', isAdmin: false,
     );
     // Create the user document in Firestore
     await _firestore.collection('users').doc(userId).set(_user.toMap());
