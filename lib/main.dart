@@ -14,14 +14,20 @@ import 'phoenix.dart';
 import 'package:provider/provider.dart';
 import 'package:mypushnotifications/providers/theme_provider.dart';
 import 'package:mypushnotifications/providers/language_provider.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'firebase_options.dart';
+
+
+// Conditional import for web
+import 'utils/web_url_strategy.dart' if (dart.library.io) 'utils/stub_url_strategy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Use this for web support
-  setUrlStrategy(PathUrlStrategy());
+  if (kIsWeb) {
+    // Use this for web support
+    configureUrl();
+  }
   
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

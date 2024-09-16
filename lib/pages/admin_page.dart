@@ -55,146 +55,147 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   Future<void> _loadAnalytics() async {
-  try {
-    setState(() => _isLoading = true);
+    try {
+      setState(() => _isLoading = true);
 
-    QuerySnapshot userSnapshot = await _firestore.collection('users').get();
-    
-    _totalUsers = userSnapshot.size;
-    print("Total users: $_totalUsers");
+      QuerySnapshot userSnapshot = await _firestore.collection('users').get();
+      
+      _totalUsers = userSnapshot.size;
+      print("Total users: $_totalUsers");
 
-    DateTime now = DateTime.now();
-    DateTime thirtyDaysAgo = now.subtract(Duration(days: 30));
+      DateTime now = DateTime.now();
+      DateTime thirtyDaysAgo = now.subtract(Duration(days: 30));
 
-    _activeUsers = userSnapshot.docs.where((doc) {
-      try {
-        Timestamp? lastLogin = doc.get('lastLogin') as Timestamp?;
-        return lastLogin != null && now.difference(lastLogin.toDate()).inDays <= 30;
-      } catch (e) {
-        print('Error processing lastLogin for user ${doc.id}: $e');
-        return false;
-      }
-    }).length;
-    print("Active users: $_activeUsers");
-
-    _userInterests = {};
-    for (var doc in userSnapshot.docs) {
-      try {
-        List<String> interests = List<String>.from(doc.get('interests') ?? []);
-        for (var interest in interests) {
-          _userInterests[interest] = (_userInterests[interest] ?? 0) + 1;
-        }
-      } catch (e) {
-        print('Error processing interests for user ${doc.id}: $e');
-      }
-    }
-    print("User interests: $_userInterests");
-
-    _userSignups = List.generate(30, (index) {
-      DateTime date = thirtyDaysAgo.add(Duration(days: index));
-      int count = userSnapshot.docs.where((doc) {
+      _activeUsers = userSnapshot.docs.where((doc) {
         try {
-          Timestamp? createdAt = doc.get('createdAt') as Timestamp?;
-          return createdAt != null &&
-                createdAt.toDate().isAfter(date) &&
-                createdAt.toDate().isBefore(date.add(Duration(days: 1)));
+          Timestamp? lastLogin = doc.get('lastLogin') as Timestamp?;
+          return lastLogin != null && now.difference(lastLogin.toDate()).inDays <= 30;
         } catch (e) {
-          print('Error processing createdAt for user ${doc.id}: $e');
+          print('Error processing lastLogin for user ${doc.id}: $e');
           return false;
         }
       }).length;
-      return MapEntry(date, count);
-    });
-    print("User signups: $_userSignups");
+      print("Active users: $_activeUsers");
 
-    _calculateNotificationStats(userSnapshot);
-    _calculateUserActivityStats(userSnapshot);
-    _calculatePreferenceStats(userSnapshot);
+      _userInterests = {};
+      for (var doc in userSnapshot.docs) {
+        try {
+          List<String> interests = List<String>.from(doc.get('interests') ?? []);
+          for (var interest in interests) {
+            _userInterests[interest] = (_userInterests[interest] ?? 0) + 1;
+          }
+        } catch (e) {
+          print('Error processing interests for user ${doc.id}: $e');
+        }
+      }
+      print("User interests: $_userInterests");
 
-    setState(() => _isLoading = false);
-  } catch (e) {
-    print("Error loading analytics: $e");
-    setState(() => _isLoading = false);
-  }
-}
-  void _calculateNotificationStats(QuerySnapshot userSnapshot) {
-  int totalNotifications = 0;
-  int totalRead = 0;
+      _userSignups = List.generate(30, (index) {
+        DateTime date = thirtyDaysAgo.add(Duration(days: index));
+        int count = userSnapshot.docs.where((doc) {
+          try {
+            Timestamp? createdAt = doc.get('createdAt') as Timestamp?;
+            return createdAt != null &&
+                  createdAt.toDate().isAfter(date) &&
+                  createdAt.toDate().isBefore(date.add(Duration(days: 1)));
+          } catch (e) {
+            print('Error processing createdAt for user ${doc.id}: $e');
+            return false;
+          }
+        }).length;
+        return MapEntry(date, count);
+      });
+      print("User signups: $_userSignups");
 
-  for (var doc in userSnapshot.docs) {
-    try {
-      List<dynamic> notifications = doc.get('notifications') as List<dynamic>? ?? [];
-      totalNotifications += notifications.length;
-      totalRead += notifications.where((n) => n['read'] == true).length;
+      _calculateNotificationStats(userSnapshot);
+      _calculateUserActivityStats(userSnapshot);
+      _calculatePreferenceStats(userSnapshot);
+
+      setState(() => _isLoading = false);
     } catch (e) {
-      print('Error processing notifications for user ${doc.id}: $e');
-      // If 'notifications' field doesn't exist, we just continue to the next user
-      continue;
+      print("Error loading analytics: $e");
+      setState(() => _isLoading = false);
     }
   }
 
-  _notificationStats = {
-    'total': totalNotifications,
-    'read': totalRead,
-    'unread': totalNotifications - totalRead,
-  };
-  print("Notification stats: $_notificationStats");
-}
+  void _calculateNotificationStats(QuerySnapshot userSnapshot) {
+    int totalNotifications = 0;
+    int totalRead = 0;
+
+    for (var doc in userSnapshot.docs) {
+      try {
+        List<dynamic> notifications = doc.get('notifications') as List<dynamic>? ?? [];
+        totalNotifications += notifications.length;
+        totalRead += notifications.where((n) => n['read'] == true).length;
+      } catch (e) {
+        print('Error processing notifications for user ${doc.id}: $e');
+        continue;
+      }
+    }
+
+    _notificationStats = {
+      'total': totalNotifications,
+      'read': totalRead,
+      'unread': totalNotifications - totalRead,
+    };
+    print("Notification stats: $_notificationStats");
+  }
   
   void _calculateUserActivityStats(QuerySnapshot userSnapshot) {
-  Map<String, int> activityLevels = {
-    'high': 0,
-    'medium': 0,
-    'low': 0,
-  };
+    Map<String, int> activityLevels = {
+      'high': 0,
+      'medium': 0,
+      'low': 0,
+    };
 
-  DateTime now = DateTime.now();
-  for (var doc in userSnapshot.docs) {
-    try {
-      Timestamp? lastLogin = doc.get('lastLogin') as Timestamp?;
-      if (lastLogin != null) {
-        int daysSinceLastLogin = now.difference(lastLogin.toDate()).inDays;
-        if (daysSinceLastLogin <= 7) {
-          activityLevels['high'] = (activityLevels['high'] ?? 0) + 1;
-        } else if (daysSinceLastLogin <= 30) {
-          activityLevels['medium'] = (activityLevels['medium'] ?? 0) + 1;
+    DateTime now = DateTime.now();
+    for (var doc in userSnapshot.docs) {
+      try {
+        Timestamp? lastLogin = doc.get('lastLogin') as Timestamp?;
+        if (lastLogin != null) {
+          int daysSinceLastLogin = now.difference(lastLogin.toDate()).inDays;
+          if (daysSinceLastLogin <= 7) {
+            activityLevels['high'] = (activityLevels['high'] ?? 0) + 1;
+          } else if (daysSinceLastLogin <= 30) {
+            activityLevels['medium'] = (activityLevels['medium'] ?? 0) + 1;
+          } else {
+            activityLevels['low'] = (activityLevels['low'] ?? 0) + 1;
+          }
         } else {
           activityLevels['low'] = (activityLevels['low'] ?? 0) + 1;
         }
-      } else {
+      } catch (e) {
+        print('Error processing activity for user ${doc.id}: $e');
         activityLevels['low'] = (activityLevels['low'] ?? 0) + 1;
       }
-    } catch (e) {
-      print('Error processing activity for user ${doc.id}: $e');
-      activityLevels['low'] = (activityLevels['low'] ?? 0) + 1;
     }
+
+    _userActivityStats = activityLevels;
+    print("User activity stats: $_userActivityStats");
   }
 
-  _userActivityStats = activityLevels;
-  print("User activity stats: $_userActivityStats");
-}
-void _calculatePreferenceStats(QuerySnapshot userSnapshot) {
-  int receiveNotifications = 0;
-  int receivePromotions = 0;
-  int receiveUpdates = 0;
+  void _calculatePreferenceStats(QuerySnapshot userSnapshot) {
+    int receiveNotifications = 0;
+    int receivePromotions = 0;
+    int receiveUpdates = 0;
 
-  for (var doc in userSnapshot.docs) {
-    try {
-      if (doc.get('receiveNotifications') == true) receiveNotifications++;
-      if (doc.get('receivePromotions') == true) receivePromotions++;
-      if (doc.get('receiveUpdates') == true) receiveUpdates++;
-    } catch (e) {
-      print('Error processing preferences for user ${doc.id}: $e');
+    for (var doc in userSnapshot.docs) {
+      try {
+        if (doc.get('receiveNotifications') == true) receiveNotifications++;
+        if (doc.get('receivePromotions') == true) receivePromotions++;
+        if (doc.get('receiveUpdates') == true) receiveUpdates++;
+      } catch (e) {
+        print('Error processing preferences for user ${doc.id}: $e');
+      }
     }
-  }
 
-  _preferenceStats = {
-    'receiveNotifications': receiveNotifications,
-    'receivePromotions': receivePromotions,
-    'receiveUpdates': receiveUpdates,
-  };
-  print("Preference stats: $_preferenceStats");
-}
+    _preferenceStats = {
+      'receiveNotifications': receiveNotifications,
+      'receivePromotions': receivePromotions,
+      'receiveUpdates': receiveUpdates,
+    };
+    print("Preference stats: $_preferenceStats");
+  }
 
   Future<void> _deleteUser(String userId) async {
     if (!_isAdmin) {
@@ -209,7 +210,7 @@ void _calculatePreferenceStats(QuerySnapshot userSnapshot) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(S.of(context).userDeletedSuccessfully)),
       );
-      _loadAnalytics(); // Refresh analytics after deleting a user
+      _loadAnalytics();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(S.of(context).errorDeletingUser(e.toString()))),
@@ -223,7 +224,7 @@ void _calculatePreferenceStats(QuerySnapshot userSnapshot) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(S.of(context).adminStatusUpdated)),
       );
-      _loadAnalytics(); // Refresh analytics after updating admin status
+      _loadAnalytics();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(S.of(context).errorUpdatingAdminStatus(e.toString()))),
@@ -309,7 +310,6 @@ void _calculatePreferenceStats(QuerySnapshot userSnapshot) {
     );
   }
   
-
   void _showDeleteConfirmationDialog(User user) {
     showDialog(
       context: context,
@@ -399,7 +399,7 @@ void _calculatePreferenceStats(QuerySnapshot userSnapshot) {
     );
   }
 
-Widget _buildSignupsChart() {
+  Widget _buildSignupsChart() {
     if (_userSignups.isEmpty || _userSignups.every((entry) => entry.value == 0)) {
       return Container(
         height: 200,
@@ -463,6 +463,14 @@ Widget _buildSignupsChart() {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          "To become an admin, use the password: '$_adminPassword'",
+                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                       Text(S.of(context).noAdminPrivileges),
                       ElevatedButton(
                         onPressed: _requestAdminPrivileges,

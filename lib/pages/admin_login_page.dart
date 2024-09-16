@@ -1,12 +1,10 @@
-// lib/pages/admin_login_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:mypushnotifications/services/admin_auth_service.dart';
 import 'package:mypushnotifications/pages/admin_page.dart';
 import 'package:mypushnotifications/generated/l10n.dart';
 
 class AdminLoginPage extends StatefulWidget {
-  const AdminLoginPage({Key? key}) : super(key: key);
+  const AdminLoginPage({super.key});
 
   @override
   _AdminLoginPageState createState() => _AdminLoginPageState();
@@ -15,20 +13,6 @@ class AdminLoginPage extends StatefulWidget {
 class _AdminLoginPageState extends State<AdminLoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      if (AdminAuthService.verifyAdminPassword(_passwordController.text)) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const AdminPage()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context).invalidAdminPassword)),
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +27,17 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Display admin password
+              const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'Admin Password: admin123',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
@@ -66,5 +61,19 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         ),
       ),
     );
+  }
+
+  void _login() {
+    if (_formKey.currentState!.validate()) {
+      if (AdminAuthService.verifyAdminPassword(_passwordController.text)) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const AdminPage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context).invalidAdminPassword)),
+        );
+      }
+    }
   }
 }
