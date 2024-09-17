@@ -60,6 +60,7 @@ class MyApp extends StatelessWidget {
           theme: themeProvider.lightTheme,
           darkTheme: themeProvider.darkTheme,
           themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+           debugShowCheckedModeBanner: false, 
           localizationsDelegates: const [
             S.delegate,
             GlobalMaterialLocalizations.delegate,

@@ -78,6 +78,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "¡Tenemos noticias emocionantes para ti!"),
         "delete": MessageLookupByLibrary.simpleMessage("Eliminar"),
         "email": MessageLookupByLibrary.simpleMessage("Correo Electrónico"),
+        "enableNotificationsMessage": MessageLookupByLibrary.simpleMessage(
+            "Para recibir notificaciones, por favor ve a la configuración y activa las notificaciones."),
         "english": MessageLookupByLibrary.simpleMessage("Inglés"),
         "enterAdminPassword": MessageLookupByLibrary.simpleMessage(
             "Ingrese la Contraseña de Administrador"),
@@ -116,6 +118,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "¡Restaurantes mejor valorados en tu zona con ofertas especiales!"),
         "foodMessage3": MessageLookupByLibrary.simpleMessage(
             "Nuevo tutorial de cocina: Aprende a hacer platos gourmet en casa."),
+        "goToSettings":
+            MessageLookupByLibrary.simpleMessage("Ir a Configuración"),
         "health": MessageLookupByLibrary.simpleMessage("Salud"),
         "hello": m6,
         "highActivity": MessageLookupByLibrary.simpleMessage("Actividad Alta"),
@@ -163,10 +167,16 @@ class MessageLookup extends MessageLookupByLibrary {
             "Sus preferencias de notificación han sido actualizadas."),
         "notificationScheduled": MessageLookupByLibrary.simpleMessage(
             "Notificación programada para 1 minuto desde ahora"),
+        "notificationSettingsUpdated": MessageLookupByLibrary.simpleMessage(
+            "Configuración de notificaciones actualizada con exito"),
         "notificationStats": MessageLookupByLibrary.simpleMessage(
             "Estadísticas de Notificaciones"),
         "notificationTitle":
             MessageLookupByLibrary.simpleMessage("Título de la notificación"),
+        "notificationsDisabled": MessageLookupByLibrary.simpleMessage(
+            "Las notificaciones están desactivadas"),
+        "notificationsEnabled": MessageLookupByLibrary.simpleMessage(
+            "Las notificaciones están activadas"),
         "password": MessageLookupByLibrary.simpleMessage("Contraseña"),
         "passwordMustBe6Chars": MessageLookupByLibrary.simpleMessage(
             "La contraseña debe tener al menos 6 caracteres"),

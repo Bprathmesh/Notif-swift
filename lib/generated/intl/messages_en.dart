@@ -72,6 +72,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "We have exciting news for you!"),
         "delete": MessageLookupByLibrary.simpleMessage("Delete"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),
+        "enableNotificationsMessage": MessageLookupByLibrary.simpleMessage(
+            "To receive notifications, please go to settings and enable notifications."),
         "english": MessageLookupByLibrary.simpleMessage("English"),
         "enterAdminPassword":
             MessageLookupByLibrary.simpleMessage("Enter Admin Password"),
@@ -112,6 +114,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Top-rated restaurants near you with special offers!"),
         "foodMessage3": MessageLookupByLibrary.simpleMessage(
             "New cooking tutorial: Learn to make gourmet dishes at home."),
+        "goToSettings": MessageLookupByLibrary.simpleMessage("Go to Settings"),
         "health": MessageLookupByLibrary.simpleMessage("Health"),
         "hello": m6,
         "highActivity": MessageLookupByLibrary.simpleMessage("High Activity"),
@@ -158,10 +161,16 @@ class MessageLookup extends MessageLookupByLibrary {
             "Your notification preferences have been updated."),
         "notificationScheduled":
             MessageLookupByLibrary.simpleMessage("Notification scheduled "),
+        "notificationSettingsUpdated": MessageLookupByLibrary.simpleMessage(
+            "Notification settings updated successfully"),
         "notificationStats":
             MessageLookupByLibrary.simpleMessage("Notification Statistics"),
         "notificationTitle":
             MessageLookupByLibrary.simpleMessage("Notification Title"),
+        "notificationsDisabled":
+            MessageLookupByLibrary.simpleMessage("Notifications are disabled"),
+        "notificationsEnabled":
+            MessageLookupByLibrary.simpleMessage("Notifications are enabled"),
         "password": MessageLookupByLibrary.simpleMessage("Password"),
         "passwordMustBe6Chars": MessageLookupByLibrary.simpleMessage(
             "Password must be at least 6 characters"),

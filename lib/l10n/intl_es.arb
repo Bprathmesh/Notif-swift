@@ -199,5 +199,11 @@
   "mediumActivity": "Actividad Media",
   "lowActivity": "Actividad Baja",
   "userPreferences": "Preferencias del Usuario",
-  "noSignupsInPeriod": "No hay registros de registro en este período"
+  "noSignupsInPeriod": "No hay registros de registro en este período",
+  "notificationSettingsUpdated": "Configuración de notificaciones actualizada con exito",
+  "notificationsDisabled": "Las notificaciones están desactivadas",
+  "notificationsEnabled": "Las notificaciones están activadas",
+  "enableNotificationsMessage": "Para recibir notificaciones, por favor ve a la configuración y activa las notificaciones.",
+  "cancel": "Cancelar",
+  "goToSettings": "Ir a Configuración"
 }

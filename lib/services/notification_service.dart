@@ -102,45 +102,99 @@ class NotificationService {
       print('Error initializing NotificationService: $e');
     }
   }
-  Future<void> toggleNotifications(bool value, String userId) async {
-    try {
-      await _firestore.collection('users').doc(userId).update({
-        'receiveNotifications': value,
-      });
-
-      if (!kIsWeb) {
-        // Mobile-specific topic subscription
-        if (value) {
-          await FirebaseMessaging.instance.subscribeToTopic('test_notifications');
-        } else {
-          await FirebaseMessaging.instance.unsubscribeFromTopic('test_notifications');
+  Future<bool> areNotificationsEnabled(String userId) async {
+  try {
+    DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+    if (userDoc.exists) {
+      return userDoc.get('receiveNotifications') ?? false;
+    }
+    return false;
+  } catch (e) {
+    print('Error checking notification settings: $e');
+    return false;
+  }
+}
+ Future<void> toggleNotifications(bool value, String userId) async {
+  try {
+    if (kIsWeb) {
+      // Web-specific handling
+      if (value) {
+        // Request permission for web notifications
+        NotificationSettings settings = await _fcm.requestPermission(
+          alert: true,
+          announcement: false,
+          badge: true,
+          carPlay: false,
+          criticalAlert: false,
+          provisional: false,
+          sound: true,
+        );
+        
+        if (settings.authorizationStatus != AuthorizationStatus.authorized) {
+          throw Exception('Notification permission not granted');
         }
-      } else {
-        // Web-specific handling
-        await _updateWebNotificationPreferences(userId, value);
       }
-    } catch (e) {
-      print('Error updating notification settings: $e');
-      rethrow;
+      await _updateWebNotificationPreferences(userId, value);
+    } else {
+      // Mobile-specific handling
+      if (value) {
+        await FirebaseMessaging.instance.subscribeToTopic('test_notifications');
+      } else {
+        await FirebaseMessaging.instance.unsubscribeFromTopic('test_notifications');
+      }
     }
-  }
-    Future<void> _updateWebNotificationPreferences(String userId, bool receiveNotifications) async {
-    try {
-      // Update user preferences in Firestore
-      await _firestore.collection('users').doc(userId).update({
-        'receiveNotifications': receiveNotifications,
-      });
 
-      // You might want to implement additional logic here for web notifications
-      // For example, you could store a flag in local storage or update your backend
-      // to know whether to send notifications to this web client
-      
-      print('Web notification preferences updated successfully');
-    } catch (e) {
-      print('Error updating web notification preferences: $e');
-      rethrow;
+    // Update Firestore
+    await _firestore.collection('users').doc(userId).update({
+      'receiveNotifications': value,
+    });
+
+    if (value) {
+      // Get and save the FCM token
+      String? token = await _fcm.getToken();
+      if (token != null) {
+        await _saveTokenToFirestore(token);
+      }
     }
+
+  } catch (e) {
+    print('Error toggling notifications: $e');
+    rethrow;
   }
+}
+Future<void> _updateWebNotificationPreferences(String userId, bool receiveNotifications) async {
+  try {
+    // Update user preferences in Firestore
+    await _firestore.collection('users').doc(userId).update({
+      'receiveNotifications': receiveNotifications,
+    });
+
+    if (receiveNotifications) {
+      // Request permission for web push notifications
+      await _fcm.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
+      
+      // Get the FCM token for this device
+      String? token = await _fcm.getToken();
+      if (token != null) {
+        await _saveTokenToFirestore(token);
+      }
+    }
+
+    print('Web notification preferences updated successfully');
+  } catch (e) {
+    print('Error updating web notification preferences: $e');
+    rethrow;
+  }
+}
+ 
   Future<void> sendNotificationToTopic(String topic, String title, String body) async {
     if (kIsWeb) {
       print('Sending notifications to topics is not directly supported on web.');
@@ -280,6 +334,10 @@ class NotificationService {
     required String body,
     required BuildContext context,
   }) async {
+    if (!await areNotificationsEnabled(userId)) {
+    print('Notifications are disabled for this user');
+    return;
+  }
     try {
       await init();
       final user = _auth.currentUser;
@@ -353,60 +411,75 @@ class NotificationService {
     return messages[DateTime.now().second % messages.length];
   }
 
-  Future<void> sendPromotionalNotification(BuildContext context) async {
-    try {
-      await init();
-      final user = _auth.currentUser;
-      if (user != null) {
-        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
-        
-        if (userDoc.exists) {
-          Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
-
-          if (userData['receivePromotions'] == true && userData['receiveNotifications'] == true) {
-            String title = S.of(context).promotionalNotificationTitle;
-            String body = S.of(context).promotionalNotificationBody(userData['name'] ?? S.of(context).user);
-
-            await _showLocalNotification(title, body);
-          } else {
-            print('User has not opted in for promotional notifications');
-          }
-        } else {
-          print('User document does not exist');
-        }
+ Future<void> sendPromotionalNotification(BuildContext context) async {
+  try {
+    await init();
+    final user = _auth.currentUser;
+    if (user != null) {
+      bool notificationsEnabled = await areNotificationsEnabled(user.uid);
+      if (!notificationsEnabled) {
+        print('Notifications are disabled for this user');
+        return;
       }
-    } catch (e) {
-      print('Error sending promotional notification: $e');
-    }
-  }
 
-  Future<void> sendUpdateNotification(BuildContext context) async {
-    try {
-      await init();
-      final user = _auth.currentUser;
-      if (user != null) {
-        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
-        
-        if (userDoc.exists) {
-          Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+      
+      if (userDoc.exists) {
+        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
 
-          if (userData['receiveUpdates'] == true) {
-            String title = S.of(context).updateNotificationTitle;
-            String body = S.of(context).updateNotificationBody;
+        if (userData['receivePromotions'] == true) {
+          String title = S.of(context).promotionalNotificationTitle;
+          String body = S.of(context).promotionalNotificationBody(userData['name'] ?? S.of(context).user);
 
-            await _showLocalNotification(title, body);
-          } else {
-            print('User has not opted in for update notifications');
-          }
+          await _showLocalNotification(title, body);
         } else {
-          print('User document does not exist');
+          print('User has not opted in for promotional notifications');
         }
+      } else {
+        print('User document does not exist');
       }
-    } catch (e) {
-      print('Error sending update notification: $e');
+    } else {
+      print('No user is currently logged in');
     }
+  } catch (e) {
+    print('Error sending promotional notification: $e');
   }
+}
 
+Future<void> sendUpdateNotification(BuildContext context) async {
+  try {
+    await init();
+    final user = _auth.currentUser;
+    if (user != null) {
+      bool notificationsEnabled = await areNotificationsEnabled(user.uid);
+      if (!notificationsEnabled) {
+        print('Notifications are disabled for this user');
+        return;
+      }
+
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+      
+      if (userDoc.exists) {
+        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+
+        if (userData['receiveUpdates'] == true) {
+          String title = S.of(context).updateNotificationTitle;
+          String body = S.of(context).updateNotificationBody;
+
+          await _showLocalNotification(title, body);
+        } else {
+          print('User has not opted in for update notifications');
+        }
+      } else {
+        print('User document does not exist');
+      }
+    } else {
+      print('No user is currently logged in');
+    }
+  } catch (e) {
+    print('Error sending update notification: $e');
+  }
+}
   Future<void> scheduleNotification(String userId, DateTime scheduledTime, String title, String body) async {
     try {
       if (!kIsWeb) {

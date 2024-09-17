@@ -200,7 +200,13 @@
   "mediumActivity": "Medium Activity",
   "lowActivity": "Low Activity",
   "userPreferences": "User Preferences",
-  "noSignupsInPeriod": "No signups in this period"
+  "noSignupsInPeriod": "No signups in this period",
+  "notificationSettingsUpdated": "Notification settings updated successfully",
+  "notificationsDisabled": "Notifications are disabled",
+  "notificationsEnabled": "Notifications are enabled",
+  "enableNotificationsMessage": "To receive notifications, please go to settings and enable notifications.",
+  "cancel": "Cancel",
+  "goToSettings": "Go to Settings"
 
   
 

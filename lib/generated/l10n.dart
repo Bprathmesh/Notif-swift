@@ -1469,6 +1469,56 @@ class S {
       args: [],
     );
   }
+
+  /// `Notification settings updated successfully`
+  String get notificationSettingsUpdated {
+    return Intl.message(
+      'Notification settings updated successfully',
+      name: 'notificationSettingsUpdated',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notifications are disabled`
+  String get notificationsDisabled {
+    return Intl.message(
+      'Notifications are disabled',
+      name: 'notificationsDisabled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notifications are enabled`
+  String get notificationsEnabled {
+    return Intl.message(
+      'Notifications are enabled',
+      name: 'notificationsEnabled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `To receive notifications, please go to settings and enable notifications.`
+  String get enableNotificationsMessage {
+    return Intl.message(
+      'To receive notifications, please go to settings and enable notifications.',
+      name: 'enableNotificationsMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Go to Settings`
+  String get goToSettings {
+    return Intl.message(
+      'Go to Settings',
+      name: 'goToSettings',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

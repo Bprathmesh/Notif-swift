@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mypushnotifications/pages/admin_login_page.dart';
-import 'package:mypushnotifications/pages/admin_page.dart';
 import 'package:mypushnotifications/pages/schedule_notification_page.dart';
 import 'package:mypushnotifications/services/auth_service.dart';
 import 'package:mypushnotifications/services/notification_service.dart';
@@ -48,12 +47,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _animationController.dispose();
     super.dispose();
   }
+
   void _navigateToScheduleNotification() {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => const ScheduleNotificationPage()),
-  );
-}
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ScheduleNotificationPage()),
+    );
+  }
 
   void _toggleLanguage() {
     final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
@@ -104,9 +104,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         } else {
           await _firebaseMessaging.unsubscribeFromTopic('test_notifications');
         }
+        _showSnackBar(value ? S.of(context).notificationsEnabled : S.of(context).notificationsDisabled);
       } catch (e) {
         print('Error updating notification settings: $e');
         _showSnackBar(S.of(context).errorUpdatingNotificationSettings);
+        // Revert the switch if there's an error
+        setState(() {
+          _receiveNotifications = !value;
+        });
       }
     }
   }
@@ -122,6 +127,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Future<void> _sendPersonalizedNotification() async {
+    if (!_receiveNotifications) {
+      _showNotificationSettingsDialog();
+      return;
+    }
+
     try {
       String? userId = _authService.getCurrentUser()?.uid;
       if (userId != null) {
@@ -142,6 +152,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Future<void> _sendPromotionalNotification() async {
+    if (!_receiveNotifications) {
+      _showNotificationSettingsDialog();
+      return;
+    }
+
     try {
       await _notificationService.sendPromotionalNotification(context);
       _showSnackBar(S.of(context).promotionalNotificationSent);
@@ -152,6 +167,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Future<void> _sendUpdateNotification() async {
+    if (!_receiveNotifications) {
+      _showNotificationSettingsDialog();
+      return;
+    }
+
     try {
       await _notificationService.sendUpdateNotification(context);
       _showSnackBar(S.of(context).updateNotificationSent);
@@ -161,7 +181,33 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
   }
 
-  
+  void _showNotificationSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(S.of(context).notificationsDisabled),
+          content: Text(S.of(context).enableNotificationsMessage),
+          actions: <Widget>[
+            TextButton(
+              child: Text(S.of(context).cancel),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(S.of(context).goToSettings),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushNamed('/preferences');
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showSnackBar(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
